@@ -1,7 +1,6 @@
 # GetFit!
 
 A Flutter project.
-TEST --JW
 
 ## Getting Started 
 ## This is a git commit branch test
