@@ -2,6 +2,8 @@
 
 A Flutter project.
 
+Alphagangstas group
+
 ## Getting Started
 
 This project is a starting point for a Flutter application.
