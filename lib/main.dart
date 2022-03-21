@@ -6,6 +6,8 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'dart:math';
 
+import 'home/home.dart';
+
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   runApp(Home());
@@ -40,7 +42,18 @@ class Home extends StatelessWidget {
                           return MyApp();
                         }));
                       },
-                    )
+                    ),
+                    ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                          primary: Colors.red
+                      ),
+                      child: Text('Home'),
+                      onPressed: () {
+                        Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) {
+                          return homePage();
+                        }));
+                      },
+                    ),
                   ],
                 )
               ),
