@@ -33,6 +33,8 @@ class MyHomePage extends StatelessWidget {
 
 class sideDrawerLeft extends StatelessWidget {
 
+
+  //builds sidebar
   @override
   Widget build(BuildContext context) {
       return Drawer(

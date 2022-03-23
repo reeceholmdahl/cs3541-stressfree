@@ -7,10 +7,12 @@ import 'package:firebase_database/firebase_database.dart';
 import 'dart:math';
 
 import 'home/home.dart';
+import 'Alarms/alarm.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  runApp(Home());
+  //runApp(Home());
+  runApp(Alarms());
 }
 
 class Home extends StatelessWidget {
