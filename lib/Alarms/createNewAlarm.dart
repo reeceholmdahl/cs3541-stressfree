@@ -2,6 +2,7 @@
 import 'dart:core';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_alarm_clock/flutter_alarm_clock.dart';
 
 
 class CreateNewAlarm extends StatelessWidget {
@@ -23,7 +24,18 @@ class CreateNewAlarm extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
 
             children: [
-
+              Container(
+                margin: const EdgeInsets.all(25),
+                child: TextButton(
+                  child: const Text(
+                    'Create alarm at 23:59',
+                    style: TextStyle(fontSize: 20.0),
+                  ),
+                  onPressed: () {
+                    FlutterAlarmClock.createAlarm(23, 59);
+                  },
+                ),
+              ),
             ],
           ),
 

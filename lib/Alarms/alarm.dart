@@ -23,13 +23,12 @@ class Alarms extends StatelessWidget {
           title: const Text('Alarm Page'),
         ),
         body: Center(
-          //children:  NewAlarmButton(),
-                  //AlarmIcon(),
-                 //NewAlarmButton(),
+
           child: Column(
-              mainAxisSize: MainAxisSize.min,
+              mainAxisSize: MainAxisSize.max,
 
               children: [
+                const SizedBox(height: 30), //adjust heights
                 AlarmIcon(),
                 NewAlarmButton()
               ],
@@ -47,7 +46,7 @@ class AlarmIcon extends StatelessWidget {
 
  Widget build(BuildContext context) {
    return Row(
-     mainAxisAlignment: MainAxisAlignment.spaceAround,
+     mainAxisAlignment: MainAxisAlignment.center,
      children: const <Widget>[
        Icon(
          Icons.access_alarms,
@@ -79,20 +78,42 @@ class _NewAlarmButtonState extends State<NewAlarmButton> {
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
 
+
           const SizedBox(height: 30),
-          ElevatedButton(
-            style: style,
-            onPressed: () {
-              Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) {
-                return CreateNewAlarm();
-              }));
-            },
-            child: const Text('Create New Alarm'),
-          ),
+          buildNewAlarmPopup()
         ],
       ),
     );
   }
+
+  Container buildNewAlarmPopup() {
+    return Container(
+      margin: const EdgeInsets.all(25),
+      child: TextButton(
+          child: const Text(
+            'Create timer',
+            style: TextStyle(fontSize: 20.0),
+          ),
+          onPressed: () {
+            // create timer
+
+            showDialog(
+                context: context,
+                builder: (context) {
+                  return AboutDialog(
+                    children: [
+                      Center(
+                        child: Text("New Alarm",
+                            style: TextStyle(
+                                fontSize: 20, fontWeight: FontWeight.bold)),
+                      )
+                    ],
+                  );
+                });
+          }),
+    );
+  }
+
 }
 
 
