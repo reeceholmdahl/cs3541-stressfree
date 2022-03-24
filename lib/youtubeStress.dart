@@ -76,7 +76,7 @@ class _MyHomePageState extends State<MyHomePage> {
       initialVideoId: _ids.first,
       flags: const YoutubePlayerFlags(
         mute: false,
-        autoPlay: true,
+        autoPlay: false,
         disableDragSeek: false,
         loop: false,
         isLive: false,
@@ -168,7 +168,7 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
           ),
           title: const Text(
-            'Youtube Player Flutter',
+            'Stress Management Techniques',
             style: TextStyle(color: Colors.white),
           ),
           actions: [
