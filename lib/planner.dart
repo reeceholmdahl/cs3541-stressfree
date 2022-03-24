@@ -1,17 +1,16 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
-class planner extends StatelessWidget {
+class Planner extends StatelessWidget {
+  const Planner({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.center,
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        ActivityTracker()
-      ],
-    )
+    return Scaffold(
+        appBar: AppBar(
+            title: const Text('Planner')
+        ),
+        body: ActivityTracker()
+    );
   }
 }
 
@@ -28,12 +27,33 @@ class _ActivityTrackerState extends State<ActivityTracker> {
   @override
   Widget build(BuildContext context) {
     return Form(
-      key: _formKey,
-      child: Row(
-        children: [
-          TextFormField()
-        ],
-      )
-    )
+        key: _formKey,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Padding(
+              padding: EdgeInsets.symmetric(
+                vertical: 16.0,
+                horizontal: 16.0
+              ),
+              child: TextFormField(
+                decoration: const InputDecoration(hintText: 'Add an activity'),
+                validator: (String? value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please enter some text';
+                  }
+
+                  return null;
+                },
+                onFieldSubmitted: (String? value) {
+                  if (_formKey.currentState!.validate()) {
+                    // submit
+                  }
+                },
+              )
+            ),
+          ],
+        )
+    );
   }
 }
