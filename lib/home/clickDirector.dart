@@ -1,6 +1,7 @@
 
-
 import 'package:flutter/cupertino.dart';
+
+import '../planner.dart';
 
 class clickDirector extends StatelessWidget {
   const clickDirector({
@@ -16,8 +17,10 @@ class clickDirector extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // TODO: implement build
-    //Can just direct to which page based on provided info
-    throw UnimplementedError();
+    if (this.id == 2) {
+      return Planner();
+    } else {
+      throw UnimplementedError();
+    }
   }
 }
