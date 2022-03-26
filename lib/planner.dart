@@ -21,7 +21,7 @@ class _ActivityTrackerState extends State<ActivityTracker> {
   final _formKey = GlobalKey<FormState>();
   final _text = TextEditingController();
 
-  late DailyActivity _activity;
+  DailyActivity _activity = DailyActivity.nullActivity;
 
   @override
   Widget build(BuildContext context) {
@@ -135,6 +135,8 @@ class Category {
     'school': school,
     'recreation': recreation
   };
+
+  static final nullCategory = Category('Null', Colors.white);
 }
 
 class DailyActivity {
@@ -156,4 +158,6 @@ class DailyActivity {
     'Did my daily journal':
         DailyActivity('Did my daily journal', Category.selfCare)
   };
+
+  static final nullActivity = DailyActivity('Null', Category.nullCategory);
 }
