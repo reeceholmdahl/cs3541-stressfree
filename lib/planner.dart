@@ -21,7 +21,6 @@ class _ActivityTrackerState extends State<ActivityTracker> {
   final _formKey = GlobalKey<FormState>();
   final _text = TextEditingController();
 
-  Color _color = Colors.transparent;
   late DailyActivity _activity;
 
   @override
@@ -40,7 +39,10 @@ class _ActivityTrackerState extends State<ActivityTracker> {
                         children: [
                           TextFormField(
                               controller: _text,
-                              decoration: const InputDecoration(
+                              style: TextStyle(color: Colors.white),
+                              decoration: InputDecoration(
+                                  fillColor: _activity.category.color,
+                                  filled: true,
                                   hintText: 'Add an activity',
                                   border: OutlineInputBorder()),
                               validator: (String? value) {
@@ -57,7 +59,7 @@ class _ActivityTrackerState extends State<ActivityTracker> {
                                 });
                               }),
                           DecoratedBox(
-                            decoration: BoxDecoration(color: _color),
+                            decoration: BoxDecoration(color: _activity.category.color),
                             child: DropdownButton<DailyActivity>(
                               items: DailyActivity.presetActivities.entries
                                   .map((entry) {
@@ -72,7 +74,6 @@ class _ActivityTrackerState extends State<ActivityTracker> {
                                 setState(() {
                                   _activity = newValue!;
                                   _text.text = newValue.name;
-                                  _color = newValue.category.color;
                                 });
                               },
                             ),
@@ -80,7 +81,7 @@ class _ActivityTrackerState extends State<ActivityTracker> {
                           ElevatedButton(
                               onPressed: () {
                                 if (_formKey.currentState!.validate()) {
-                                  // submit to database
+                                  // TODO submit to database
                                 }
                               },
                               child: Text('Add activity'))
