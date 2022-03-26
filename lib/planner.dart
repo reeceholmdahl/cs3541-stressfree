@@ -19,7 +19,8 @@ class _ActivityTrackerState extends State<ActivityTracker> {
   final _formKey = GlobalKey<FormState>();
   final _text = TextEditingController();
 
-  String _location = 'Drank water';
+  Color _color = Colors.transparent;
+  DailyActivity _dropdown = DailyActivity.presetActivities['Drank water']!;
 
   @override
   Widget build(BuildContext context) {
@@ -47,20 +48,25 @@ class _ActivityTrackerState extends State<ActivityTracker> {
 
                                 return null;
                               }),
-                          DropdownButton(
-                              value: _location,
-                              onChanged: (String? newValue) {
-                                setState(() {
-                                  _location = newValue!;
-                                  _text.text = newValue;
-                                });
-                              },
-                              items: DailyActivity.presetActivities.entries
-                                  .map((entry) {
+                          DecoratedBox(
+                            decoration: BoxDecoration(
+                              color: _color
+                            ),
+                            child: DropdownButton<DailyActivity>(
+                              items: DailyActivity.presetActivities.entries.map((entry) {
                                 final a = entry.value;
-                                return DropdownMenuItem(
-                                    value: a.name, child: Text(a.name));
-                              }).toList())
+                                return DropdownMenuItem<DailyActivity>(
+                                    value: a, child: Container(color: a.category.color, child: Text(a.name)));
+                              }).toList(),
+                                onChanged: (DailyActivity? newValue) {
+                                  setState(() {
+                                    _dropdown = newValue!;
+                                    _text.text = newValue.name;
+                                    _color = newValue.category.color;
+                                  });
+                                },
+                            ),
+                          )
                         ],
                       ))),
               Spacer(flex: 1),
