@@ -52,6 +52,7 @@ class _ActivityTrackerState extends State<ActivityTracker> {
                               onChanged: (String? newValue) {
                                 setState(() {
                                   _location = newValue!;
+                                  _text.text = newValue;
                                 });
                               },
                               items: DailyActivity.presetActivities.entries
