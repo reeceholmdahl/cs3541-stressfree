@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 
 class Planner extends StatelessWidget {
@@ -20,7 +22,7 @@ class _ActivityTrackerState extends State<ActivityTracker> {
   final _text = TextEditingController();
 
   Color _color = Colors.transparent;
-  DailyActivity _dropdown = DailyActivity.presetActivities['Drank water']!;
+  late DailyActivity _activity;
 
   @override
   Widget build(BuildContext context) {
@@ -47,26 +49,41 @@ class _ActivityTrackerState extends State<ActivityTracker> {
                                 }
 
                                 return null;
+                              },
+                              onChanged: (String? newValue) {
+                                setState(() {
+                                  _activity = DailyActivity(
+                                      newValue!, _activity.category);
+                                });
                               }),
                           DecoratedBox(
-                            decoration: BoxDecoration(
-                              color: _color
-                            ),
+                            decoration: BoxDecoration(color: _color),
                             child: DropdownButton<DailyActivity>(
-                              items: DailyActivity.presetActivities.entries.map((entry) {
+                              items: DailyActivity.presetActivities.entries
+                                  .map((entry) {
                                 final a = entry.value;
                                 return DropdownMenuItem<DailyActivity>(
-                                    value: a, child: Container(color: a.category.color, child: Text(a.name)));
+                                    value: a,
+                                    child: Container(
+                                        color: a.category.color,
+                                        child: Text(a.name)));
                               }).toList(),
-                                onChanged: (DailyActivity? newValue) {
-                                  setState(() {
-                                    _dropdown = newValue!;
-                                    _text.text = newValue.name;
-                                    _color = newValue.category.color;
-                                  });
-                                },
+                              onChanged: (DailyActivity? newValue) {
+                                setState(() {
+                                  _activity = newValue!;
+                                  _text.text = newValue.name;
+                                  _color = newValue.category.color;
+                                });
+                              },
                             ),
-                          )
+                          ),
+                          ElevatedButton(
+                              onPressed: () {
+                                if (_formKey.currentState!.validate()) {
+                                  // submit to database
+                                }
+                              },
+                              child: Text('Add activity'))
                         ],
                       ))),
               Spacer(flex: 1),
@@ -78,15 +95,16 @@ class _ActivityTrackerState extends State<ActivityTracker> {
                         final c = entry.value;
                         return ElevatedButton(
                             onPressed: () {
-                              setState(() {});
+                              setState(() {
+                                _activity = DailyActivity(_activity.name, c);
+                              });
                             },
                             style: ElevatedButton.styleFrom(
                                 primary: c.color, onPrimary: Colors.white),
                             child: Text(c.name,
                                 style: TextStyle(fontSize: 14),
                                 textAlign: TextAlign.center));
-                      }).toList()
-                      ))
+                      }).toList()))
             ]));
   }
 }
