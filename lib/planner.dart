@@ -1,5 +1,7 @@
 import 'dart:developer';
 
+import 'package:firstapp/mood.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class Planner extends StatelessWidget {
@@ -22,6 +24,7 @@ class _ActivityTrackerState extends State<ActivityTracker> {
   final _text = TextEditingController();
 
   DailyActivity _activity = DailyActivity.nullActivity;
+  Mood _mood = Mood.nullMood;
 
   @override
   Widget build(BuildContext context) {
@@ -59,7 +62,8 @@ class _ActivityTrackerState extends State<ActivityTracker> {
                                 });
                               }),
                           DecoratedBox(
-                            decoration: BoxDecoration(color: _activity.category.color),
+                            decoration:
+                                BoxDecoration(color: _activity.category.color),
                             child: DropdownButton<DailyActivity>(
                               items: DailyActivity.presetActivities.entries
                                   .map((entry) {
@@ -81,7 +85,7 @@ class _ActivityTrackerState extends State<ActivityTracker> {
                           ElevatedButton(
                               onPressed: () {
                                 if (_formKey.currentState!.validate()) {
-                                  // TODO submit to database
+                                  logActivity();
                                 }
                               },
                               child: Text('Add activity'))
@@ -91,22 +95,58 @@ class _ActivityTrackerState extends State<ActivityTracker> {
               Expanded(
                   flex: 4,
                   child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: Category.categories.entries.map((entry) {
-                        final c = entry.value;
-                        return ElevatedButton(
-                            onPressed: () {
-                              setState(() {
-                                _activity = DailyActivity(_activity.name, c);
-                              });
-                            },
-                            style: ElevatedButton.styleFrom(
-                                primary: c.color, onPrimary: Colors.white),
-                            child: Text(c.name,
-                                style: TextStyle(fontSize: 14),
-                                textAlign: TextAlign.center));
-                      }).toList()))
+                    children: [
+                      Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: Category.categories.entries.map((entry) {
+                            final c = entry.value;
+                            return ElevatedButton(
+                                onPressed: () {
+                                  setState(() {
+                                    _activity =
+                                        DailyActivity(_activity.name, c);
+                                  });
+                                },
+                                style: ElevatedButton.styleFrom(
+                                    primary: c.color, onPrimary: Colors.white),
+                                child: Text(c.name,
+                                    style: TextStyle(fontSize: 14),
+                                    textAlign: TextAlign.center));
+                          }).toList()),
+                      Column(
+                          children: Mood.moods.entries.map((entry) {
+                        final m = entry.value;
+                        return Card(
+                            color: _mood == m
+                                ? m.color.shade700
+                                : m.color.shade400,
+                            child: InkWell(
+                                splashColor: m.color.shade50.withAlpha(30),
+                                onTap: () {
+                                  setState(() {
+                                    _mood = m;
+                                  });
+                                },
+                                child: SizedBox(
+                                  width: 50,
+                                  height: 50,
+                                  child: Column(
+                                    children: [
+                                      const Icon(Icons.android_outlined,
+                                          size: 20),
+                                      Text(m.name,
+                                          style: TextStyle(fontSize: 12))
+                                    ],
+                                  ),
+                                )));
+                      }).toList())
+                    ],
+                  ))
             ]));
+  }
+
+  void logActivity() {
+    log(_activity.name + ' ' + _activity.category.name + ' ' + _mood.name);
   }
 }
 
@@ -116,14 +156,14 @@ class Category {
 
   const Category(this.name, this.color);
 
-  static final selfCare = Category('Self care', Colors.red);
-  static final exercise = Category('Exercise', Colors.yellow);
-  static final hobby = Category('Hobby', Colors.green);
-  static final social = Category('Social', Colors.blue);
-  static final job = Category('Job', Colors.deepPurple);
-  static final cleaning = Category('Cleaning', Colors.orange);
-  static final school = Category('School', Colors.pink);
-  static final recreation = Category('Recreation', Colors.teal);
+  static final selfCare = Category('self care', Colors.red);
+  static final exercise = Category('exercise', Colors.yellow);
+  static final hobby = Category('hobby', Colors.green);
+  static final social = Category('social', Colors.blue);
+  static final job = Category('job', Colors.deepPurple);
+  static final cleaning = Category('cleaning', Colors.orange);
+  static final school = Category('school', Colors.pink);
+  static final recreation = Category('recreation', Colors.teal);
 
   static final categories = {
     'selfCare': selfCare,
@@ -146,16 +186,16 @@ class DailyActivity {
   const DailyActivity(this.name, this.category);
 
   static final presetActivities = {
-    'Drank water': DailyActivity('Drank water', Category.selfCare),
-    'Went outside': DailyActivity('Went outside', Category.recreation),
-    'Did homework': DailyActivity('Did homework', Category.school),
-    'Talked to a friend': DailyActivity('Talked to a friend', Category.social),
-    'Took a shower': DailyActivity('Took a shower', Category.selfCare),
-    'Brushed my teeth': DailyActivity('Brushed my teeth', Category.selfCare),
-    'Did the dishes': DailyActivity('Did the dishes', Category.cleaning),
-    'Meditated': DailyActivity('Meditated', Category.selfCare),
-    'Did yoga': DailyActivity('Did yoga', Category.exercise),
-    'Did my daily journal':
+    'drank water': DailyActivity('Drank water', Category.selfCare),
+    'went outside': DailyActivity('Went outside', Category.recreation),
+    'did homework': DailyActivity('Did homework', Category.school),
+    'talked to a friend': DailyActivity('Talked to a friend', Category.social),
+    'took a shower': DailyActivity('Took a shower', Category.selfCare),
+    'brushed my teeth': DailyActivity('Brushed my teeth', Category.selfCare),
+    'did the dishes': DailyActivity('Did the dishes', Category.cleaning),
+    'meditated': DailyActivity('Meditated', Category.selfCare),
+    'did yoga': DailyActivity('Did yoga', Category.exercise),
+    'did my daily journal':
         DailyActivity('Did my daily journal', Category.selfCare)
   };
 
