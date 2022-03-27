@@ -1,4 +1,3 @@
-
 import 'package:flutter/cupertino.dart';
 
 import 'dart:core';
@@ -50,13 +49,10 @@ class TestState extends State<Test> {
                 //child :
 
                 scroll = new scrollWheel(),
-
-
               ],
             ),
             actions: <Widget>[
               toggle = new Toggle(),
-
               MaterialButton(
                   elevation: 5.0,
                   child: Text("Submit"),
@@ -64,16 +60,14 @@ class TestState extends State<Test> {
                     int hour = 0;
                     int minutes;
 
-
                     hour = scroll._currentValue;
                     minutes = scroll._currentValue2;
 
                     bool AM = toggle.isSelected[0];
 
-                    if(!AM) {
+                    if (!AM) {
                       hour += 12;
                     }
-
                     // creating alarm after converting hour
                     // and minute into integer
                     FlutterAlarmClock.createAlarm(hour, minutes);
@@ -93,18 +87,26 @@ class TestState extends State<Test> {
         child: Column(
           mainAxisSize: MainAxisSize.max,
           children: [
-            const SizedBox(height: 10), //adjust heights
+            const SizedBox(height: 10),
+            //adjust heights
             AlarmIcon(),
-            TextButton(
-              child: const Text(
-                'AlarmButton',
-                style: TextStyle(fontSize: 20.0),
-              ),
-              onPressed: () {
-                buildNewAlarmPopup(context);
-                //Test();
-              },
-            ),
+            const SizedBox(height: 300),
+            //edit this and change format of button
+
+            new Align(
+                alignment: Alignment.bottomCenter,
+
+                child:
+              IconButton(
+                icon: const Icon(Icons.add_circle_rounded),
+                color: Colors.lightBlue,
+                iconSize: 60,
+                onPressed: () {
+                  buildNewAlarmPopup(context);
+                },
+              )
+            )
+            //SavedAlarms(), //shows the saved alarms
           ],
         ),
       ),
@@ -121,8 +123,6 @@ class scrollWheel extends StatefulWidget {
 }
 
 class scrollWheelState extends State<scrollWheel> {
-
-
   Widget build(BuildContext context) {
     return Flexible(
         child: Row(children: <Widget>[
@@ -146,6 +146,37 @@ class scrollWheelState extends State<scrollWheel> {
   }
 }
 
+class SavedAlarms extends StatefulWidget {
+  SavedAlarmState createState() => SavedAlarmState();
+}
+
+class SavedAlarmState extends State<SavedAlarms> {
+  Widget build(BuildContext context) {
+    return Center(
+      child: Card(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: <Widget>[
+            const ListTile(
+              //leading: Icon(Icons.album),
+              title: Text('The Enchanted Nightingale'),
+              subtitle: Text('Music by Julie Gable. Lyrics by Sidney Stein.'),
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: <Widget>[
+                const SizedBox(width: 8),
+                OnOffToggle(),
+                const SizedBox(width: 8),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
 class Toggle extends StatefulWidget {
   List<bool> isSelected = [true, false];
 
@@ -154,7 +185,6 @@ class Toggle extends StatefulWidget {
 }
 
 class ToggleState extends State<Toggle> {
-
   Widget build(BuildContext context) {
     return Row(
       //appBar: AppBar(
@@ -190,7 +220,8 @@ class ToggleState extends State<Toggle> {
                   buttonIndex < widget.isSelected.length;
                   buttonIndex++) {
                 if (buttonIndex == index) {
-                  widget.isSelected[buttonIndex] = !widget.isSelected[buttonIndex];
+                  widget.isSelected[buttonIndex] =
+                      !widget.isSelected[buttonIndex];
                 } else {
                   widget.isSelected[buttonIndex] = false;
                 }
@@ -203,18 +234,55 @@ class ToggleState extends State<Toggle> {
   }
 }
 
+class OnOffToggle extends StatefulWidget {
+  //bool isSwitched = false;
+
+  OnOffToggleState createState() => OnOffToggleState();
+}
+
+class OnOffToggleState extends State<OnOffToggle> {
+  bool isSwitched = false;
+
+  Widget build(BuildContext context) {
+    return Row(
+      //appBar: AppBar(
+      //title: const Text('ToggleButtons'),
+      //),
+      //body: Center(
+      //child: Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: <Widget>[
+        Switch(
+          value: isSwitched,
+          onChanged: (value) {
+            setState(() {
+              isSwitched = value;
+              print(isSwitched);
+            });
+          },
+          activeTrackColor: Colors.lightGreenAccent,
+          activeColor: Colors.green,
+        ),
+      ],
+    );
+  }
+}
+
 class AlarmIcon extends StatelessWidget {
   const AlarmIcon({Key? key}) : super(key: key);
 
   Widget build(BuildContext context) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
-      children: const <Widget>[
-        Icon(
-          Icons.access_alarms,
+      children: [
+        IconButton(
+          icon: const Icon(Icons.access_alarms),
           color: Colors.pink,
-          size: 100.0,
-          semanticLabel: 'Text to announce in accessibility modes',
+          iconSize: 100.0,
+
+          onPressed: () {
+            FlutterAlarmClock.showAlarms();
+          },
         ),
       ],
     );
