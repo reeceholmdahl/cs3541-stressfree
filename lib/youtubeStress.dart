@@ -15,11 +15,11 @@ void main() {
       statusBarColor: Colors.blueAccent,
     ),
   );
-  runApp(YoutubePlayerDemoApp());
+  runApp(youtubeStressPage());
 }
 
-/// Creates [YoutubePlayerDemoApp] widget.
-class YoutubePlayerDemoApp extends StatelessWidget {
+
+class youtubeStressPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
