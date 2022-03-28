@@ -27,6 +27,12 @@ class _ActivityTrackerState extends State<ActivityTracker> {
   Mood _mood = Mood.nullMood;
 
   @override
+  void dispose() {
+    _text.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Padding(
         padding: EdgeInsets.all(16.0),
