@@ -1,3 +1,4 @@
+import 'package:firstapp/youtubeStress.dart';
 import 'package:flutter/material.dart';
 
 import 'homeTab.dart';
@@ -81,9 +82,9 @@ class sideDrawerLeft extends StatelessWidget {
             ListTile(
               title: const Text('Stress Release Videos'),
               onTap: () {
-                // Update the state of the app
-                // ...
-                // Then close the drawer
+                Navigator.pop(context);
+                Navigator.push<void>(context,
+                    MaterialPageRoute(builder: (context) => youtubeStressPage()));
                 Navigator.pop(context);
               },
             ),
