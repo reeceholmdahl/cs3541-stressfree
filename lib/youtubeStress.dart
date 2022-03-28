@@ -28,7 +28,7 @@ class YoutubePlayerDemoApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
         appBarTheme: const AppBarTheme(
-          color: Colors.blueAccent,
+          color: Colors.deepPurpleAccent,
           textTheme: TextTheme(
             headline6: TextStyle(
               color: Colors.white,
@@ -38,7 +38,7 @@ class YoutubePlayerDemoApp extends StatelessWidget {
           ),
         ),
         iconTheme: const IconThemeData(
-          color: Colors.blueAccent,
+          color: Colors.deepPurpleAccent,
         ),
       ),
       home: MyHomePage(),
