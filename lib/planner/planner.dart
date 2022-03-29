@@ -15,6 +15,8 @@ class Planner extends StatelessWidget {
   }
 }
 
+// TODO needs to be split into several sub-widgets and use notifiers for communication- this is hard to maintain
+// TOOD needs to be coupled be with the planner feature in next sprint
 class ActivityTracker extends StatefulWidget {
   @override
   State<ActivityTracker> createState() => _ActivityTrackerState();
@@ -197,6 +199,7 @@ class Category {
   static final school = Category('school', Colors.pink);
   static final recreation = Category('recreation', Colors.teal);
 
+  // TODO move these to constants file
   static final categories = {
     'selfCare': selfCare,
     'exercise': exercise,
@@ -217,6 +220,7 @@ class DailyActivity {
 
   const DailyActivity(this.name, this.category);
 
+  // TODO move these to constants file
   static final presetActivities = {
     'drank water': DailyActivity('Drank water', Category.selfCare),
     'went outside': DailyActivity('Went outside', Category.recreation),
