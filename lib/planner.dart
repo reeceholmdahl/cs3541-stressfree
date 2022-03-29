@@ -10,7 +10,9 @@ class Planner extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(title: const Text('Planner')), body: ActivityTracker());
+        resizeToAvoidBottomInset: false,
+        appBar: AppBar(title: const Text('Planner')),
+        body: ActivityTracker());
   }
 }
 
@@ -43,7 +45,7 @@ class _ActivityTrackerState extends State<ActivityTracker> {
               Form(
                   key: _formKey,
                   child: Expanded(
-                      flex: 7,
+                      flex: 10,
                       child: Column(
                         children: [
                           TextFormField(
@@ -94,7 +96,12 @@ class _ActivityTrackerState extends State<ActivityTracker> {
                                   logActivity();
                                 }
                               },
-                              child: Text('Add activity'))
+                              child: Text('Add activity')),
+                          Expanded(child: SingleChildScrollView(child: Row(
+                            children: [
+                              Expanded(child: Container(color: Colors.brown, child: Text('Hello'))),
+                            ],
+                          )))
                         ],
                       ))),
               Spacer(flex: 1),
