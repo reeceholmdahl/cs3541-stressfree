@@ -2,7 +2,7 @@ import 'package:flutter/cupertino.dart';
 
 import '../main.dart';
 import 'home.dart';
-import '../planner.dart';
+import '../planner/planner.dart';
 
 class clickDirector extends StatelessWidget {
   const clickDirector({
