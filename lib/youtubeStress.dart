@@ -20,6 +20,7 @@ void main() {
 
 
 class youtubeStressPage extends StatelessWidget {
+  const youtubeStressPage({Key? key}) : super(key: key);
   @override
   Widget build(BuildContext context) {
     return MaterialApp(

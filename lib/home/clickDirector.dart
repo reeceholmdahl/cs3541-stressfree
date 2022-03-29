@@ -1,3 +1,4 @@
+import 'package:firstapp/youtubeStress.dart';
 import 'package:flutter/cupertino.dart';
 
 import '../main.dart';
@@ -20,7 +21,8 @@ class clickDirector extends StatelessWidget {
       return MyApp(); //remove these and just replace with your class
     } else if (this.id == 2) {
       return Planner(); //remove these and just replace with your class
-    } else {
+    }
+    else {
       return MyApp();
     }
   }
