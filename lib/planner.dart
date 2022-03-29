@@ -1,7 +1,6 @@
 import 'dart:developer';
 
 import 'package:firstapp/mood.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class Planner extends StatelessWidget {
@@ -97,9 +96,14 @@ class _ActivityTrackerState extends State<ActivityTracker> {
                                 }
                               },
                               child: Text('Add activity')),
-                          Expanded(child: SingleChildScrollView(child: Row(
+                          Expanded(
+                              child: SingleChildScrollView(
+                                  child: Row(
                             children: [
-                              Expanded(child: Container(color: Colors.brown, child: Text('Hello'))),
+                              Expanded(
+                                  child: Container(
+                                      color: Colors.brown,
+                                      child: Text('Hello'))),
                             ],
                           )))
                         ],
