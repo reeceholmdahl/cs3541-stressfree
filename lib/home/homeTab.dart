@@ -38,8 +38,6 @@ class homeTabState extends State<homeTab> {
                   MaterialPageRoute(
                     builder: (context) => clickDirector(
                           id: index,
-                          name: tileNames[index],
-                          color: colors[index],
                         ),
                   ), // Where the click will lead you. Implement from here
                 ),
