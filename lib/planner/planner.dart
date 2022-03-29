@@ -27,6 +27,8 @@ class _ActivityTrackerState extends State<ActivityTracker> {
   DailyActivity _activity = DailyActivity.nullActivity;
   Mood _mood = Mood.nullMood;
 
+  List<DailyActivity> _activities = List.empty(growable: true);
+
   @override
   void dispose() {
     _text.dispose();
@@ -97,15 +99,22 @@ class _ActivityTrackerState extends State<ActivityTracker> {
                               },
                               child: Text('Add activity')),
                           Expanded(
-                              child: SingleChildScrollView(
-                                  child: Row(
-                            children: [
-                              Expanded(
-                                  child: Container(
-                                      color: Colors.brown,
-                                      child: Text('Hello'))),
-                            ],
-                          )))
+                              child: ListView.builder(
+                                  itemCount: _activities.length,
+                                  itemBuilder:
+                                      (BuildContext context, int index) {
+                                    final activity = _activities[index];
+                                    return ListTile(
+                                        onTap: () {
+                                          setState(() {
+                                            _activities.removeAt(index);
+                                          });
+                                        },
+                                        leading: Icon(Icons.menu),
+                                        title: Text(activity.name),
+                                        tileColor: activity.category.color,
+                                        trailing: Icon(Icons.android));
+                                  }))
                         ],
                       ))),
               Spacer(flex: 1),
@@ -164,6 +173,12 @@ class _ActivityTrackerState extends State<ActivityTracker> {
 
   void logActivity() {
     log(_activity.name + ' ' + _activity.category.name + ' ' + _mood.name);
+    if (_activity.category != Category.nullCategory && _mood != Mood.nullMood) {
+      setState(() {
+        _activities.add(_activity);
+      });
+      log('Added activity');
+    }
   }
 }
 
