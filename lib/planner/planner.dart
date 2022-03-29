@@ -16,7 +16,7 @@ class Planner extends StatelessWidget {
 }
 
 // TODO needs to be split into several sub-widgets and use notifiers for communication- this is hard to maintain
-// TOOD needs to be coupled be with the planner feature in next sprint
+// TODO needs to be coupled be with the planner feature in next sprint
 class ActivityTracker extends StatefulWidget {
   @override
   State<ActivityTracker> createState() => _ActivityTrackerState();
