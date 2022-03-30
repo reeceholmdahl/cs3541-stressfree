@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:firstapp/planner/constants.dart';
 import 'package:firstapp/planner/data/planned_activity.dart';
 import 'package:firstapp/planner/planner_settings.dart';
@@ -47,9 +49,54 @@ class _PlanActivityState extends State<PlanActivity> {
                 bottom: BorderSide(color: theme.dividerColor, width: 5))),
         child: Container(
           height: 80,
-          child: Row(children: [Text('PlanActivity')]),
+          child: Row(children: [Text('PlanActivity'), ActivityEntryField()]),
         ));
   }
+}
+
+class ActivityEntryField extends FormField<String> {
+  ActivityEntryField({Key? key})
+      : super(
+            key: key,
+            builder: (state) {
+              final _textControl = TextEditingController();
+              return Expanded(
+                child: SizedBox(
+                    height: 50,
+                    child: DecoratedBox(
+                        decoration:
+                            BoxDecoration(color: Colors.purple.shade300),
+                        child: Stack(
+                          children: [
+                            Positioned(
+                              left: 40,
+                              child: SizedBox(
+                                width: 100,
+                                child: TextFormField(
+                                  controller: _textControl,
+                                  decoration:
+                                      InputDecoration(border: InputBorder.none),
+                                ),
+                              ),
+                            ),
+                            Positioned(
+                              left: 0,
+                              child: PopupMenuButton<String>(
+                                  icon: Icon(Icons.arrow_drop_down,
+                                      size: 40, color: Colors.green.shade700),
+                                  offset: Offset.fromDirection(math.pi / 2, 50),
+                                  padding: EdgeInsets.zero,
+                                  itemBuilder: (context) => [
+                                        for (final activity
+                                            in presetActivitiesList)
+                                          PopupMenuItem(
+                                              child: Text(activity.name))
+                                      ]),
+                            ),
+                          ],
+                        ))),
+              );
+            });
 }
 
 class ActivityList extends StatefulWidget {

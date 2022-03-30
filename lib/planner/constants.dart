@@ -26,7 +26,7 @@ final presetActivities = {
       PlannedActivity('Did my daily journal', activityCategories['self care']!)
 };
 
-get presetActivitiesList {
+List<PlannedActivity> get presetActivitiesList {
   return presetActivities.entries.map((a) => a.value).toList(growable: false);
 }
 
