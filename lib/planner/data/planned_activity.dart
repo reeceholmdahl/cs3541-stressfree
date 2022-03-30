@@ -1,6 +1,13 @@
 import 'package:firstapp/planner/data/activity_category.dart';
 
-class PlannedActivity {
+abstract class Activity {
+  String get name;
+  ActivityCategory get category;
+
+  const Activity();
+}
+
+class PlannedActivity extends Activity {
   final String name;
   final ActivityCategory category;
 
