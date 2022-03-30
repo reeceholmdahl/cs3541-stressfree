@@ -31,12 +31,16 @@ List<PlannedActivity> get presetActivitiesList {
 }
 
 final activityCategories = {
-  'self care': ActivityCategory('self care', Colors.red),
-  'exercise': ActivityCategory('exercise', Colors.yellow),
-  'hobby': ActivityCategory('hobby', Colors.green),
-  'social': ActivityCategory('social', Colors.blue),
-  'job': ActivityCategory('job', Colors.deepPurple),
-  'cleaning': ActivityCategory('cleaning', Colors.orange),
-  'school': ActivityCategory('school', Colors.pink),
-  'recreation': ActivityCategory('recreation', Colors.teal)
+  'self care': ActivityCategory('Self care', Colors.red),
+  'exercise': ActivityCategory('Exercise', Colors.yellow),
+  'hobby': ActivityCategory('Hobby', Colors.green),
+  'social': ActivityCategory('Social', Colors.blue),
+  'job': ActivityCategory('Job', Colors.deepPurple),
+  'cleaning': ActivityCategory('Cleaning', Colors.orange),
+  'school': ActivityCategory('School', Colors.pink),
+  'recreation': ActivityCategory('Recreation', Colors.teal)
 };
+
+List<ActivityCategory> get activityCategoriesList {
+  return activityCategories.entries.map((c) => c.value).toList(growable: false);
+}

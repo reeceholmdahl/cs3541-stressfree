@@ -1,9 +1,13 @@
+import 'dart:developer';
 import 'dart:math' as math;
 
+import 'package:firstapp/drawer.dart';
 import 'package:firstapp/planner/constants.dart';
 import 'package:firstapp/planner/data/planned_activity.dart';
 import 'package:firstapp/planner/planner_settings.dart';
 import 'package:flutter/material.dart';
+
+import 'data/activity_category.dart';
 
 class Planner extends StatelessWidget {
   const Planner({Key? key}) : super(key: key);
@@ -11,6 +15,7 @@ class Planner extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+        drawer: sideDrawerLeft(),
         resizeToAvoidBottomInset: false,
         appBar: AppBar(
           title: const Text('Planner'),
@@ -40,59 +45,96 @@ class PlanActivity extends StatefulWidget {
 
 class _PlanActivityState extends State<PlanActivity> {
   final _textControl = TextEditingController();
+  final _formKey = GlobalKey<FormState>();
+  final _dropdownKey = GlobalKey<FormFieldState<ActivityCategory>>();
+
+  ActivityCategory _category = activityCategoriesList[4];
 
   @override
   Widget build(BuildContext context) {
     final theme = ThemeData.light();
-    return DecoratedBox(
-        decoration: BoxDecoration(
-            color: theme.backgroundColor,
-            border: Border(
-                bottom: BorderSide(color: theme.dividerColor, width: 5))),
-        child: Container(
-          height: 80,
-          child: Row(children: [
-            Expanded(
-              child: SizedBox(
-                  height: 50,
-                  child: DecoratedBox(
-                      decoration: BoxDecoration(color: Colors.purple.shade300),
-                      child: Stack(
-                        children: [
-                          Positioned(
-                            left: 40,
-                            child: SizedBox(
-                              width: 150,
-                              child: TextFormField(
-                                controller: _textControl,
-                                decoration:
-                                    InputDecoration(border: InputBorder.none),
+    return Form(
+      key: _formKey,
+      child: DecoratedBox(
+          decoration: BoxDecoration(
+              color: theme.backgroundColor,
+              border: Border(
+                  bottom: BorderSide(color: theme.dividerColor, width: 5))),
+          child: Container(
+            height: 80,
+            child: Row(children: [
+              Expanded(
+                child: SizedBox(
+                    height: 50,
+                    child: DecoratedBox(
+                        decoration:
+                            BoxDecoration(color: Colors.purple.shade300),
+                        child: Stack(
+                          children: [
+                            Positioned(
+                              left: 40,
+                              child: SizedBox(
+                                width: 150,
+                                child: TextFormField(
+                                  controller: _textControl,
+                                  decoration:
+                                      InputDecoration(border: InputBorder.none),
+                                ),
                               ),
                             ),
-                          ),
-                          Positioned(
-                            left: 0,
-                            child: PopupMenuButton<PlannedActivity>(
-                                onSelected: (value) {
-                                  _textControl.text = value.name;
-                                },
-                                icon: Icon(Icons.arrow_drop_down,
-                                    size: 40, color: Colors.green.shade700),
-                                offset: Offset.fromDirection(math.pi / 2, 50),
-                                padding: EdgeInsets.zero,
-                                itemBuilder: (context) => [
-                                      for (final activity
-                                          in presetActivitiesList)
-                                        PopupMenuItem(
-                                            value: activity,
-                                            child: Text(activity.name))
-                                    ]),
-                          ),
-                        ],
-                      ))),
-            )
-          ]),
-        ));
+                            Positioned(
+                              left: 0,
+                              child: PopupMenuButton<PlannedActivity>(
+                                  elevation: 2,
+                                  onSelected: (value) {
+                                    _textControl.text = value.name;
+                                    _dropdownKey.currentState!
+                                        // ignore: invalid_use_of_protected_member
+                                        .setValue(value.category);
+                                  },
+                                  icon: Icon(Icons.arrow_drop_down,
+                                      size: 40, color: Colors.green.shade700),
+                                  offset: Offset.fromDirection(math.pi / 2, 50),
+                                  padding: EdgeInsets.zero,
+                                  itemBuilder: (context) => [
+                                        for (final activity
+                                            in presetActivitiesList)
+                                          PopupMenuItem(
+                                              value: activity,
+                                              child: Text(activity.name))
+                                      ]),
+                            ),
+                            Positioned(
+                                right: 0,
+                                child: SizedBox(
+                                  width: 100,
+                                  child: Builder(builder: (context) {
+                                    final dropdown = DropdownButtonFormField<
+                                            ActivityCategory>(
+                                        key: _dropdownKey,
+                                        decoration: InputDecoration(
+                                            border: InputBorder.none),
+                                        elevation: 2,
+                                        value: _category,
+                                        onChanged: (value) {
+                                          log(value!.name);
+                                        },
+                                        items: [
+                                          for (final category
+                                              in activityCategoriesList)
+                                            DropdownMenuItem(
+                                                value: category,
+                                                child: Text(category.name))
+                                        ]);
+                                    return dropdown;
+                                  }),
+                                ))
+                          ],
+                        ))),
+              )
+            ]),
+          )),
+    );
   }
 }
 
