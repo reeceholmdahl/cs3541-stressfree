@@ -1,11 +1,9 @@
 import 'package:firstapp/Alarms/alarm.dart';
-import 'package:firstapp/youtubeStress.dart';
 import 'package:flutter/cupertino.dart';
 
 import '../main.dart';
 import 'home.dart';
-import '../planner.dart';
-
+import '../planner/planner.dart';
 
 class clickDirector extends StatelessWidget {
   const clickDirector({
@@ -25,9 +23,8 @@ class clickDirector extends StatelessWidget {
       return Planner(); //remove these and just replace with your class
     } else if (this.id == 3) {
       return Alarms();
-    }
-    else {
-      return MyApp();
+    } else {
+      throw UnimplementedError();
     }
   }
 }
