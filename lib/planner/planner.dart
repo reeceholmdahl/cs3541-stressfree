@@ -40,7 +40,7 @@ class Planner extends StatelessWidget {
 
 class PlanActivity extends StatefulWidget {
   @override
-  State<StatefulWidget> createState() => _PlanActivityState();
+  State<PlanActivity> createState() => _PlanActivityState();
 }
 
 class _PlanActivityState extends State<PlanActivity> {
@@ -119,22 +119,67 @@ class _PlanActivityState extends State<PlanActivity> {
                       ]),
                 ),
               ),
-              IconButton(
-                  padding: EdgeInsets.zero,
-                  icon: const Icon(Icons.arrow_right_rounded,
-                      size: 40, color: Colors.blue),
-                  onPressed: () {
-                    log('submit button');
-                  })
+              _AnimatedSubmitButton(onPressed: () {
+                log('submit button');
+              })
             ]),
           )),
     );
   }
 }
 
+class _AnimatedSubmitButton extends StatefulWidget {
+  final VoidCallback onPressed;
+
+  _AnimatedSubmitButton({required this.onPressed});
+
+  @override
+  State<_AnimatedSubmitButton> createState() => _AnimatedSubmitButtonState();
+}
+
+class _AnimatedSubmitButtonState extends State<_AnimatedSubmitButton>
+    with TickerProviderStateMixin {
+  late final AnimationController _ctrl;
+  late final Animation<double> _rotation;
+
+  @override
+  void initState() {
+    super.initState();
+    _ctrl =
+        AnimationController(vsync: this, duration: Duration(milliseconds: 200));
+    _rotation = Tween<double>(begin: 0, end: 0.25).animate(_ctrl);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+        color: Colors.blue,
+        child: RotationTransition(
+            turns: _rotation,
+            child: IconButton(
+              onPressed: () async {
+                widget.onPressed();
+                await Future.delayed(Duration(milliseconds: 100));
+                _ctrl.forward();
+                await Future.delayed(Duration(milliseconds: 400));
+                _ctrl.reverse();
+              },
+              icon: const Icon(Icons.arrow_right_rounded,
+                  size: 50, color: Colors.white),
+              padding: EdgeInsets.zero,
+            )));
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    _ctrl.dispose();
+  }
+}
+
 class ActivityList extends StatefulWidget {
   @override
-  State<StatefulWidget> createState() => _ActivityListState();
+  State<ActivityList> createState() => _ActivityListState();
 }
 
 class _ActivityListState extends State<ActivityList> {
