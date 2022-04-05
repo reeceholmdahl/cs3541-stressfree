@@ -9,14 +9,10 @@ class Planner extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        resizeToAvoidBottomInset: false,
-        appBar: AppBar(title: const Text('Planner')),
-        body: ActivityTracker());
+        appBar: AppBar(title: const Text('Planner')), body: ActivityTracker());
   }
 }
 
-// TODO needs to be split into several sub-widgets and use notifiers for communication- this is hard to maintain
-// TODO needs to be coupled be with the planner feature in next sprint
 class ActivityTracker extends StatefulWidget {
   @override
   State<ActivityTracker> createState() => _ActivityTrackerState();
@@ -28,8 +24,6 @@ class _ActivityTrackerState extends State<ActivityTracker> {
 
   DailyActivity _activity = DailyActivity.nullActivity;
   Mood _mood = Mood.nullMood;
-
-  List<DailyActivity> _activities = List.empty(growable: true);
 
   @override
   void dispose() {
@@ -48,7 +42,7 @@ class _ActivityTrackerState extends State<ActivityTracker> {
               Form(
                   key: _formKey,
                   child: Expanded(
-                      flex: 10,
+                      flex: 7,
                       child: Column(
                         children: [
                           TextFormField(
@@ -99,24 +93,7 @@ class _ActivityTrackerState extends State<ActivityTracker> {
                                   logActivity();
                                 }
                               },
-                              child: Text('Add activity')),
-                          Expanded(
-                              child: ListView.builder(
-                                  itemCount: _activities.length,
-                                  itemBuilder:
-                                      (BuildContext context, int index) {
-                                    final activity = _activities[index];
-                                    return ListTile(
-                                        onTap: () {
-                                          setState(() {
-                                            _activities.removeAt(index);
-                                          });
-                                        },
-                                        leading: Icon(Icons.menu),
-                                        title: Text(activity.name),
-                                        tileColor: activity.category.color,
-                                        trailing: Icon(Icons.android));
-                                  }))
+                              child: Text('Add activity'))
                         ],
                       ))),
               Spacer(flex: 1),
@@ -175,12 +152,6 @@ class _ActivityTrackerState extends State<ActivityTracker> {
 
   void logActivity() {
     log(_activity.name + ' ' + _activity.category.name + ' ' + _mood.name);
-    if (_activity.category != Category.nullCategory && _mood != Mood.nullMood) {
-      setState(() {
-        _activities.add(_activity);
-      });
-      log('Added activity');
-    }
   }
 }
 
@@ -199,7 +170,6 @@ class Category {
   static final school = Category('school', Colors.pink);
   static final recreation = Category('recreation', Colors.teal);
 
-  // TODO move these to constants file
   static final categories = {
     'selfCare': selfCare,
     'exercise': exercise,
@@ -220,7 +190,6 @@ class DailyActivity {
 
   const DailyActivity(this.name, this.category);
 
-  // TODO move these to constants file
   static final presetActivities = {
     'drank water': DailyActivity('Drank water', Category.selfCare),
     'went outside': DailyActivity('Went outside', Category.recreation),
