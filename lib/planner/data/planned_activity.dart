@@ -1,5 +1,7 @@
 import 'package:firstapp/planner/data/activity_category.dart';
+import 'package:flutter/material.dart';
 
+@immutable
 abstract class Activity {
   String get name;
   ActivityCategory get category;
@@ -7,6 +9,7 @@ abstract class Activity {
   const Activity();
 }
 
+@immutable
 class PlannedActivity extends Activity {
   final String name;
   final ActivityCategory category;

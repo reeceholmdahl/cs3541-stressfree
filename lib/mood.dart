@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-/// Immutable object once created
+@immutable
 class Mood {
   final String name;
   final MaterialColor color;
