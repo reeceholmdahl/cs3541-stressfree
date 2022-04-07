@@ -2,7 +2,7 @@ import 'dart:developer';
 
 import 'package:firstapp/drawer.dart';
 import 'package:firstapp/planner/constants.dart';
-import 'package:firstapp/planner/data/planned_activity.dart';
+import 'package:firstapp/data/planned_activity.dart';
 import 'package:firstapp/planner/planner_settings.dart';
 import 'package:flutter/material.dart';
 import 'dart:math' as math;
@@ -131,6 +131,21 @@ class ActivityListItem<T extends Activity> extends StatelessWidget {
                     padding: const EdgeInsets.symmetric(horizontal: 12),
                     onPressed: () {
                       log('Complete activity');
+                      showDialog(
+                          context: context,
+                          builder: (context) => AlertDialog(
+                                content: Text(activity.name +
+                                    '\n' +
+                                    activity.category.name),
+                                actions: [
+                                  TextButton(
+                                    onPressed: () {
+                                      Navigator.of(context).pop();
+                                    },
+                                    child: const Text('CANCEL'),
+                                  ),
+                                ],
+                              ));
                     },
                   ),
                 ],

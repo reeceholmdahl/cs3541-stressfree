@@ -1,4 +1,4 @@
-import 'package:firstapp/planner/data/activity_category.dart';
+import 'package:firstapp/data/activity_category.dart';
 import 'package:flutter/material.dart';
 
 @immutable

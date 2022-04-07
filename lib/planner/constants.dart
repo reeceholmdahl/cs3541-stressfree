@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-import 'data/activity_category.dart';
-import 'data/planned_activity.dart';
+import 'package:firstapp/data/activity_category.dart';
+import 'package:firstapp/data/planned_activity.dart';
 
 // TODO eventually all these these should be moved to the database
 

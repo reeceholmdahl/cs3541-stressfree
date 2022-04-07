@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:firstapp/mood.dart';
-import 'package:firstapp/planner/data/planned_activity.dart';
+import 'package:firstapp/data/mood.dart';
+import 'package:firstapp/data/planned_activity.dart';
 
 @immutable
 class TrackedActivity extends Activity {
