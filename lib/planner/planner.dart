@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:firstapp/drawer.dart';
 import 'package:firstapp/planner/constants.dart';
 import 'package:firstapp/planner/data/planned_activity.dart';
@@ -36,9 +38,7 @@ class Planner extends StatelessWidget {
         // _newPlannedActivity.addListener(() {
         // });
 
-        return ActivityListItem(
-          activity: PlannedActivity.nullActivity,
-        );
+        return ActivityList();
       }),
       floatingActionButton: PlannerFab(),
     );
@@ -53,16 +53,19 @@ class PlannerFab extends StatelessWidget {
     return ExpandableFab(distance: 112, closeFab: _closeFab, children: [
       ActionButton(
         icon: Icon(Icons.schedule),
+        color: Colors.teal,
         onPressed: () => _closeFab.notify(),
       ),
       ActionButton(
         icon: Icon(Icons.check_circle_outline),
+        color: Colors.green,
         onPressed: () {
           _closeFab.notify();
         },
       ),
       ActionButton(
         icon: Icon(Icons.calendar_month),
+        color: Colors.blue,
         onPressed: () => showDialog<void>(
             context: context,
             builder: (context) => AlertDialog(
@@ -90,8 +93,9 @@ class PlannerFab extends StatelessWidget {
 
 class ActivityListItem<T extends Activity> extends StatelessWidget {
   ActivityListItem({
+    Key? key,
     required this.activity,
-  });
+  }) : super(key: key);
 
   final T activity;
 
@@ -99,17 +103,41 @@ class ActivityListItem<T extends Activity> extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
-      height: 48,
-      decoration: BoxDecoration(
-        borderRadius: const BorderRadius.all(Radius.circular(8)),
-        color: activity.category.color.shade300,
-      ),
-      child: Row(
-        children: [
-          Text('Hello, world'),
-          Text('Goodbye, friend'),
-        ],
+      color: activity.category.color.shade100,
+      child: Padding(
+        padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+        child: SizedBox(
+          height: 64,
+          child: Material(
+            borderRadius: const BorderRadius.all(Radius.circular(8)),
+            color: activity.category.color.shade400,
+            child: InkWell(
+              borderRadius: const BorderRadius.all(Radius.circular(8)),
+              splashColor: activity.category.color.shade300,
+              onDoubleTap: () {
+                log('Double tap');
+              },
+              child: Row(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 12),
+                    child: Icon(Icons.reorder),
+                  ),
+                  Expanded(
+                      child: Text(activity.name,
+                          style: theme.textTheme.subtitle1)),
+                  IconButton(
+                    icon: Icon(Icons.radio_button_unchecked),
+                    padding: const EdgeInsets.symmetric(horizontal: 12),
+                    onPressed: () {
+                      log('Complete activity');
+                    },
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
       ),
     );
   }
@@ -127,18 +155,39 @@ class _ActivityListState extends State<ActivityList> {
 
   @override
   Widget build(BuildContext context) {
-    return ReorderableListView.builder(
-        restorationId: 'activitiesList',
-        onReorder: (oldIndex, newIndex) {},
-        itemCount: _activities.length,
-        itemBuilder: (context, index) {
-          final activity = _activities[index];
-          return ListTile(
-            key: ValueKey(index),
-            title: Text(activity.name),
-            tileColor: activity.category.color,
-          );
-        });
+    return Scrollbar(
+      isAlwaysShown: true,
+      child: Stack(
+        children: [
+          DecoratedBox(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+
+                /// TODO make gradient follow dragged list item
+                colors: [Colors.blue, Colors.red],
+              ),
+            ),
+            child: Container(),
+          ),
+          Theme(
+            data: Theme.of(context).copyWith(
+                canvasColor: Colors.transparent,
+                shadowColor: Colors.transparent),
+            child: ReorderableListView.builder(
+                restorationId: 'activitiesList',
+                onReorder: (oldIndex, newIndex) {},
+                itemCount: _activities.length,
+                itemBuilder: (context, index) {
+                  final activity = _activities[index];
+                  return ActivityListItem(
+                      key: ValueKey(index), activity: activity);
+                }),
+          ),
+        ],
+      ),
+    );
   }
 }
 
@@ -340,10 +389,12 @@ class ActionButton extends StatelessWidget {
   const ActionButton({
     Key? key,
     this.onPressed,
+    this.color,
     required this.icon,
   }) : super(key: key);
 
   final VoidCallback? onPressed;
+  final Color? color;
   final Widget icon;
 
   @override
@@ -352,7 +403,7 @@ class ActionButton extends StatelessWidget {
     return Material(
       shape: const CircleBorder(),
       clipBehavior: Clip.antiAlias,
-      color: theme.colorScheme.secondary,
+      color: color ?? theme.colorScheme.secondary,
       elevation: 4.0,
       child: IconButton(
         onPressed: onPressed,
