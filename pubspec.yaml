@@ -57,11 +57,6 @@ flutter:
   uses-material-design: true
 
   # To add assets to your application, add an assets section, like this:
-  assets:
-    - assets/icon-great.png
-    - assets/icon-good.png
-    - assets/icon-medium.png
-    - assets/icon-bad.png
 
   fonts:
     - family: icomoon
