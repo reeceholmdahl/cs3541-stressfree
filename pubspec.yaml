@@ -63,6 +63,11 @@ flutter:
     - assets/icon-medium.png
     - assets/icon-bad.png
 
+  fonts:
+    - family: icomoon
+      fonts:
+       - asset: fonts/icomoon.ttf
+
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.
 
