@@ -148,6 +148,7 @@ class ActivityListItem<T extends Activity> extends StatelessWidget {
   }
 }
 
+@immutable
 class MoodRater extends StatefulWidget {
   const MoodRater({
     Key? key,
@@ -160,7 +161,11 @@ class MoodRater extends StatefulWidget {
   State<MoodRater> createState() => _MoodRaterState();
 }
 
+/// TODO animate color change
+
 class _MoodRaterState extends State<MoodRater> {
+  Mood selected = Mood.nullMood;
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -177,15 +182,38 @@ class _MoodRaterState extends State<MoodRater> {
       ),
       content: SizedBox(
         width: double.maxFinite,
-        child: Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
-          for (var mood in Mood.moods.values)
-            IconButton(
-                padding: EdgeInsets.zero,
-                onPressed: () {
-                  log(mood.name);
-                },
-                icon: Icon(mood.iconData, size: 50))
-        ]),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            for (var mood in Mood.moods.values)
+              DecoratedBox(
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  border: Border.all(color: mood.color.shade400, width: 4),
+                  color: selected == mood
+                      ? mood.color.shade400
+                      : mood.color.shade50,
+                ),
+                child: Material(
+                  shape: CircleBorder(),
+                  child: InkWell(
+                    splashColor: mood.color.shade300,
+                    customBorder: CircleBorder(),
+                    onTap: () {
+                      log(mood.name);
+                      setState(() {
+                        selected = mood;
+                      });
+                    },
+                    child: Padding(
+                      padding: const EdgeInsets.all(12.0),
+                      child: Icon(mood.iconData, size: 40),
+                    ),
+                  ),
+                ),
+              )
+          ],
+        ),
       ),
       actions: [
         TextButton(
