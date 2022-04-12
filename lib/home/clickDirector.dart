@@ -1,4 +1,5 @@
 import 'package:firstapp/Alarms/alarm.dart';
+import 'package:firstapp/Informatics/Informatics.dart';
 import 'package:flutter/cupertino.dart';
 
 import '../main.dart';
@@ -18,7 +19,7 @@ class clickDirector extends StatelessWidget {
     if (this.id == 0) {
       return homePage(); //remove these and just replace with your class
     } else if (this.id == 1) {
-      return MyApp(); //remove these and just replace with your class
+      return Informatics(); //remove these and just replace with your class
     } else if (this.id == 2) {
       return Planner(); //remove these and just replace with your class
     } else if (this.id == 3) {
