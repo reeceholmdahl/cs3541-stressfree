@@ -1,5 +1,6 @@
 import 'package:firstapp/journal/journal.dart';
 import 'package:firstapp/youtubeStress.dart';
+import 'package:firstapp/SelfCare/self_care.dart';
 import 'package:flutter/material.dart';
 
 import 'home/home.dart';
@@ -76,6 +77,8 @@ class sideDrawerLeft extends StatelessWidget {
               // ...
               // Then close the drawer
               Navigator.pop(context);
+              Navigator.push<void>(context,
+                  MaterialPageRoute(builder: (context) => const SelfCarePage()));
             },
           ),
           ListTile(
