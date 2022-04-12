@@ -73,9 +73,6 @@ class sideDrawerLeft extends StatelessWidget {
           ListTile(
             title: const Text('Self Care Ideas'),
             onTap: () {
-              // Update the state of the app
-              // ...
-              // Then close the drawer
               Navigator.pop(context);
               Navigator.push<void>(context,
                   MaterialPageRoute(builder: (context) => const SelfCarePage()));
