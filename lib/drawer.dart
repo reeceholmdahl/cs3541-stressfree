@@ -1,4 +1,5 @@
 import 'package:firstapp/journal/journal.dart';
+import 'package:firstapp/stressManagement/stressManagement.dart';
 import 'package:firstapp/youtubeStress.dart';
 import 'package:flutter/material.dart';
 
@@ -63,19 +64,15 @@ class sideDrawerLeft extends StatelessWidget {
           ListTile(
             title: const Text('Stress Management Techniques'),
             onTap: () {
-              // Update the state of the app
-              // ...
-              // Then close the drawer
               Navigator.pop(context);
+              Navigator.push<void>(context,
+                  MaterialPageRoute(builder: (context) => const stressManagement()));
             },
           ),
           ListTile(
             title: const Text('Self Care Ideas'),
             onTap: () {
-              // Update the state of the app
-              // ...
-              // Then close the drawer
-              Navigator.pop(context);
+
             },
           ),
           ListTile(

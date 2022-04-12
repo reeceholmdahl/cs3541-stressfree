@@ -13,6 +13,7 @@ class journal extends StatelessWidget {
         appBar: AppBar(
           title: const Text(appTitle),
         ),
+        resizeToAvoidBottomInset: false,
         drawer: sideDrawerLeft(),
         body: const journalArea(),
       ),
@@ -29,7 +30,18 @@ class journalArea extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
         Padding(
-          padding: EdgeInsets.symmetric(horizontal: 15, vertical: 16),
+          padding: EdgeInsets.symmetric(horizontal: 15, vertical: 15),
+          child: Center(
+            child: Container(
+              child: Text(
+                'How do you feel today?',
+                style: Theme.of(context).textTheme.headline6,
+              ),
+            ),
+          ),
+        ),
+        Padding(
+          padding: EdgeInsets.symmetric(horizontal: 15, vertical: 5),
             child: Center(
               child: Row(
                 children: <Widget>[
