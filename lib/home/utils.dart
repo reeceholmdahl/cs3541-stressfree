@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 
 const homePageItemsList = [
   "Tip of the Day",
-  "Calendar",
+  "Informatics",
   "Planner",
   "Alarm",
   "Soothing Music"

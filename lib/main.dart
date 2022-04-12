@@ -12,8 +12,8 @@ import 'Alarms/alarm.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  //runApp(Home());
-  runApp(Informatics());
+  runApp(Home());
+
 }
 
 class Home extends StatelessWidget {
