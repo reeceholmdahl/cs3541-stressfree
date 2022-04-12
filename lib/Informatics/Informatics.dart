@@ -44,12 +44,7 @@ class _HomePageState extends State<HomePage> {
     "Sad": 2,
   };
 
-  final legendLabels = <String, String>{
-    "FlutterNExt": "Flutter legend",
-    "React": "React legend",
-    "Xamarin": "Xamarin legend",
-    "Ionic": "Ionic legend",
-  };
+
 
   final colorList = <Color>[
     Color(0xfffdcb6e),
