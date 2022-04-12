@@ -1,7 +1,6 @@
 import 'dart:developer';
 
-import 'package:firstapp/mood.dart';
-import 'package:flutter/cupertino.dart';
+import 'package:firstapp/data/mood.dart';
 import 'package:flutter/material.dart';
 
 class Planner extends StatelessWidget {
