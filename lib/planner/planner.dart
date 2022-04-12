@@ -207,8 +207,9 @@ class _AddPlannedActivityState extends State<AddPlannedActivity> {
             child: const Text('CANCEL'),
           ),
           TextButton(
-            onPressed: (_formKey.currentState == null ||
-                    _formKey.currentState!.validate())
+            onPressed: (activity != PlannedActivity.nullActivity &&
+                    (_formKey.currentState == null ||
+                        _formKey.currentState!.validate()))
                 ? () {
                     // TODO Add new activity
                     Navigator.of(context).pop();
