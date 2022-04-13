@@ -5,6 +5,8 @@ import 'package:flutter_alarm_clock/flutter_alarm_clock.dart';
 import 'package:numberpicker/numberpicker.dart';
 import 'package:flutter/material.dart';
 
+import '../drawer.dart';
+
 class Alarms extends StatelessWidget {
   const Alarms({Key? key}) : super(key: key);
 
@@ -94,6 +96,7 @@ class TestState extends State<Test> {
           onPressed: null,
         ),
       ],
+      drawer: sideDrawerLeft(),
       appBar: AppBar(
         title: const Text('Alarm Page'),
       ),

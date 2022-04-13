@@ -2,6 +2,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 
+import 'drawer.dart';
+
 /// Creates list of video players
 class VideoList extends StatefulWidget {
   @override
@@ -30,6 +32,7 @@ class _VideoListState extends State<VideoList> {
       appBar: AppBar(
         title: const Text('Stress Management Technique List'),
       ),
+      drawer: sideDrawerLeft(),
       body: ListView.separated(
         itemBuilder: (context, index) {
           return YoutubePlayer(
