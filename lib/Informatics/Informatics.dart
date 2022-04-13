@@ -4,6 +4,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:firstapp/data/mood.dart';
 
 import 'package:pie_chart/pie_chart.dart';
 
@@ -38,20 +39,17 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   final dataMap = <String, double>{
-    "Happy": 5,
-    "Mildly Happy": 3,
-    "Mildly Sad": 2,
-    "Sad": 2,
+    "Bad": 5,
+    "Medium": 3,
+    "Good": 2,
+    "Great": 2,
   };
 
-
-
   final colorList = <Color>[
-    Color(0xfffdcb6e),
-    Color(0xff0984e3),
-    Color(0xfffd79a8),
-    Color(0xffe17055),
-    Color(0xff6c5ce7),
+    (Mood.moods["bad"]!.color),
+    Mood.moods["medium"]!.color,
+    Mood.moods["good"]!.color,
+    Mood.moods["great"]!.color,
   ];
 
   ChartType? _chartType = ChartType.disc;
@@ -79,24 +77,28 @@ class _HomePageState extends State<HomePage> {
     return showDialog(
         context: context,
         builder: (context) {
-          return AlertDialog(
-            title: Text(title),
-            content: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text("When you were " + title + " you did ",),
-                Container(
-                    height: 200,
-                    width: 200,
-                    child: ListView.builder(
-                        itemCount: activityList.length,
-                        itemBuilder: (BuildContext context, int index) {
-                          return Text(activityList.elementAt(index));
-                        }))
-              ],
-            ),
-            actions: <Widget>[],
-          );
+          return Wrap(children: [
+            AlertDialog(
+              title: Text(title),
+              content: Column(
+                //mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    "When you were " + title + " you did ",
+                  ),
+                  Container(
+                      height: 200,
+                      width: 200,
+                      child: ListView.builder(
+                          itemCount: activityList.length,
+                          itemBuilder: (BuildContext context, int index) {
+                            return Text(activityList.elementAt(index),);
+                          }))
+                ],
+              ),
+              actions: <Widget>[],
+            )
+          ]);
         }); //showDialog
   }
 
@@ -141,6 +143,7 @@ class _HomePageState extends State<HomePage> {
       initialAngleInDegree: 0,
       chartType: _chartType!,
 
+
       // legendLabels: _showLegendLabel ? legendLabels : {},
 
       chartValuesOptions: ChartValuesOptions(
@@ -175,7 +178,7 @@ class _HomePageState extends State<HomePage> {
                       return TextButton(
                         style: ButtonStyle(
                           foregroundColor:
-                              MaterialStateProperty.all<Color>(Colors.blue),
+                              MaterialStateProperty.all<Color>(colorList.elementAt(index)),
                         ),
                         onPressed: () {
                           for (int i = 0; i < dataMap.length; ++i) {
