@@ -40,7 +40,7 @@ class Home extends StatelessWidget {
                       style: ElevatedButton.styleFrom(
                           primary: Colors.green
                       ),
-                      child: Text('Begin'),
+                      child: Text('TestBed'),
                       onPressed: () {
                         Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) {
                           return TestPage();

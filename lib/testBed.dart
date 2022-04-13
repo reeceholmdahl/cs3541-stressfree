@@ -16,7 +16,9 @@ class _TestPageState extends State<TestPage> {
 
 
 
-
+/*
+  Pull data from the database child "Messages" and returns the values fetched.
+ */
   Future<String> pullData() async
   {
 
@@ -26,10 +28,13 @@ class _TestPageState extends State<TestPage> {
     return (event.snapshot.value.toString());
 
   }
+  /*
+  Awaits the data to be pulled from pullData() and prints to the console.
+   */
 
-  void fetchData()
+  Future<void> fetchData () async
   {
-    var data =  pullData();
+    var data =  await pullData();
     print(data);
   }
 
@@ -91,8 +96,7 @@ class _TestPageState extends State<TestPage> {
                               color: Colors.pinkAccent,
                               child: Text("Pull From DB"),
                               onPressed: () {
-                                //String temp =
-                                pullData();
+                                fetchData();
                                 showDialog<String>(
                                     context: context,
                                     builder: (BuildContext context) => AlertDialog(
