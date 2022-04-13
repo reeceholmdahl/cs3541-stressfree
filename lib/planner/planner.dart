@@ -9,6 +9,20 @@ class Planner extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+        persistentFooterButtons: [
+          IconButton(
+            icon: const Icon(Icons.play_arrow),
+            onPressed: null,
+          ),
+          IconButton(
+            icon: const Icon(Icons.pause),
+            onPressed: null,
+          ),
+          IconButton(
+            icon: const Icon(Icons.skip_next),
+            onPressed: null,
+          ),
+        ],
         appBar: AppBar(title: const Text('Planner')), body: ActivityTracker());
   }
 }
@@ -34,6 +48,7 @@ class _ActivityTrackerState extends State<ActivityTracker> {
   @override
   Widget build(BuildContext context) {
     return Padding(
+
         padding: EdgeInsets.all(16.0),
         child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,

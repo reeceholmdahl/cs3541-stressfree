@@ -6,12 +6,14 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'dart:math';
 
+import 'Informatics/Informatics.dart';
 import 'home/home.dart';
 import 'Alarms/alarm.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   runApp(Home());
+
 }
 
 class Home extends StatelessWidget {

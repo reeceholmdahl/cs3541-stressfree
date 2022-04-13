@@ -12,7 +12,7 @@ class homePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Stress Free',
-      home: MyHomePage()
+      home: MyHomePage(),
     );
   }
 }
