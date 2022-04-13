@@ -154,6 +154,20 @@ class _HomePageState extends State<HomePage> {
     );
 
     return Scaffold(
+        persistentFooterButtons: [
+          IconButton(
+            icon: const Icon(Icons.play_arrow),
+            onPressed: null,
+          ),
+          IconButton(
+            icon: const Icon(Icons.pause),
+            onPressed: null,
+          ),
+          IconButton(
+            icon: const Icon(Icons.skip_next),
+            onPressed: null,
+          ),
+        ],
         appBar: AppBar(
           title: const Text('Sample Code'),
         ),

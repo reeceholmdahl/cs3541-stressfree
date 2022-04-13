@@ -72,6 +72,20 @@ class readMore extends StatelessWidget {
     );
 
     return Scaffold(
+      persistentFooterButtons: [
+        IconButton(
+          icon: const Icon(Icons.play_arrow),
+          onPressed: null,
+        ),
+        IconButton(
+          icon: const Icon(Icons.pause),
+          onPressed: null,
+        ),
+        IconButton(
+          icon: const Icon(Icons.skip_next),
+          onPressed: null,
+        ),
+      ],
       body: Column(
         children: <Widget>[topContent, bottomContent],
       ),

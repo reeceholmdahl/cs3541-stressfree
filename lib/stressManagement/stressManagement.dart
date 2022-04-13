@@ -90,6 +90,20 @@ class _ListPageState extends State<ListPage> {
 
 
     return Scaffold(
+      persistentFooterButtons: [
+        IconButton(
+          icon: const Icon(Icons.play_arrow),
+          onPressed: null,
+        ),
+        IconButton(
+          icon: const Icon(Icons.pause),
+          onPressed: null,
+        ),
+        IconButton(
+          icon: const Icon(Icons.skip_next),
+          onPressed: null,
+        ),
+      ],
       body: makeBody,
       resizeToAvoidBottomInset: false,
     );

@@ -34,6 +34,7 @@ class _ActivityTrackerState extends State<ActivityTracker> {
   @override
   Widget build(BuildContext context) {
     return Padding(
+
         padding: EdgeInsets.all(16.0),
         child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,

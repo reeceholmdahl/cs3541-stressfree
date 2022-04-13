@@ -24,6 +24,8 @@ class clickDirector extends StatelessWidget {
       return Planner(); //remove these and just replace with your class
     } else if (this.id == 3) {
       return Alarms();
+    } else if(this.id == 4) {
+      throw UnimplementedError();
     } else {
       throw UnimplementedError();
     }
