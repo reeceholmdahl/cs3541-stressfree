@@ -1,5 +1,4 @@
 import 'dart:developer';
-import 'dart:math' as math;
 
 import 'package:firstapp/data/activity_category.dart';
 import 'package:flutter/material.dart';
@@ -13,14 +12,133 @@ import 'constants.dart';
 import 'planner_settings.dart';
 import 'expandable_fab.dart';
 
-class _Notifier with ChangeNotifier {
+class PlannerMediator {
+  final List<Activity> activities = [];
+  final notifier = BasicNotifier();
+
+  dynamic _sender;
+
+  void notify(sender) {
+    _sender = sender;
+
+    log('notify: ' + sender.runtimeType.toString());
+
+    if (sender is ActivityAdder) {
+      log('notify: _onAddActivity');
+      _onAddActivity();
+    } else if (sender is ActivityRemover) {
+      log('notify: _onRemoveActivity');
+      _onRemoveActivity();
+    } else if (sender is MoodTracker) {
+      log('notify: _onTrackActivity');
+      _onTrackActivity();
+    } else if (sender is ActivityReorderer) {
+      log('notify: _onReorderActivity');
+      _onReorderActivity();
+    }
+  }
+
+  void _onAddActivity() {
+    assert(_sender is ActivityAdder);
+
+    final sender = _sender as ActivityAdder;
+    activities.insert(0, sender.activity);
+
+    notifier.notify();
+  }
+
+  void _onRemoveActivity() {
+    assert(_sender is ActivityRemover);
+
+    final sender = _sender as ActivityRemover;
+    activities.removeAt(sender.index);
+
+    notifier.notify();
+  }
+
+  void _onTrackActivity() {
+    assert(_sender is MoodTracker);
+
+    final sender = _sender as MoodTracker;
+
+    assert(activities[sender.index] is PlannedActivity);
+
+    activities.insert(
+        sender.index,
+        new TrackedActivity(
+            activities[sender.index] as PlannedActivity, sender.mood));
+
+    activities.removeAt(sender.index + 1);
+
+    notifier.notify();
+  }
+
+  void _onReorderActivity() {
+    assert(_sender is ActivityReorderer);
+
+    final sender = _sender as ActivityReorderer;
+
+    int newIndex = sender.newIndex;
+    if (sender.oldIndex < newIndex) {
+      newIndex -= 1;
+    }
+    final Activity activity = activities.removeAt(sender.oldIndex);
+    activities.insert(newIndex, activity);
+  }
+}
+
+class ActivityAdder {
+  final Activity activity;
+
+  ActivityAdder({required PlannerMediator mediator, required this.activity}) {
+    mediator.notify(this);
+  }
+}
+
+class ActivityRemover {
+  final int index;
+
+  ActivityRemover({required PlannerMediator mediator, required this.index}) {
+    mediator.notify(this);
+  }
+}
+
+class MoodTracker {
+  final int index;
+  final Mood mood;
+
+  MoodTracker(
+      {required PlannerMediator mediator,
+      required this.index,
+      required this.mood}) {
+    mediator.notify(this);
+  }
+}
+
+class ActivityReorderer {
+  final int oldIndex, newIndex;
+
+  ActivityReorderer(
+      {required PlannerMediator mediator,
+      required this.oldIndex,
+      required this.newIndex}) {
+    mediator.notify(this);
+  }
+}
+
+class BasicNotifier with ChangeNotifier {
   void notify() {
     notifyListeners();
   }
 }
 
-class Planner extends StatelessWidget {
-  Planner({Key? key}) : super(key: key);
+class Planner extends StatefulWidget {
+  @override
+  State<Planner> createState() => _PlannerState();
+}
+
+class _PlannerState extends State<Planner> {
+  final mediator = PlannerMediator();
 
   @override
   Widget build(BuildContext context) {
@@ -43,47 +161,49 @@ class Planner extends StatelessWidget {
           )
         ],
       ),
-      body: Builder(
-        builder: (context) {
-          // _newPlannedActivity.addListener(() {
-          // });
-
-          return ActivityList();
+      body: AnimatedBuilder(
+        animation: mediator.notifier,
+        builder: (context, child) {
+          return ActivityListView(mediator: mediator);
         },
       ),
-      floatingActionButton: PlannerFab(),
+      floatingActionButton: PlannerFab(mediator: mediator),
     );
   }
 }
 
 class PlannerFab extends StatelessWidget {
-  final _closeFab = _Notifier();
+  final _closeFabNotifier = BasicNotifier();
+  final PlannerMediator mediator;
+
+  PlannerFab({required this.mediator});
 
   @override
   Widget build(BuildContext context) {
     return ExpandableFab(
       distance: 112,
-      closeFab: _closeFab,
+      closeFab: _closeFabNotifier,
       children: [
         ActionButton(
           icon: Icon(Icons.schedule),
           color: Colors.teal,
-          onPressed: () => _closeFab.notify(),
+          onPressed: () => _closeFabNotifier.notify(),
         ),
         ActionButton(
           icon: Icon(Icons.check_circle_outline),
           color: Colors.green,
           onPressed: () {
-            _closeFab.notify();
+            _closeFabNotifier.notify();
           },
         ),
         ActionButton(
           icon: Icon(Icons.calendar_month),
           color: Colors.blue,
           onPressed: () => showDialog<void>(
-            context: context,
-            builder: (context) => AddPlannedActivity(),
-          ),
+              context: context,
+              builder: (context) {
+                return AddPlannedActivity(mediator: mediator);
+              }),
         )
       ],
     );
@@ -91,15 +211,25 @@ class PlannerFab extends StatelessWidget {
 }
 
 class AddPlannedActivity extends StatefulWidget {
+  final PlannerMediator mediator;
+
+  AddPlannedActivity({required this.mediator});
+
   @override
   State<AddPlannedActivity> createState() => _AddPlannedActivityState();
 }
 
 class _AddPlannedActivityState extends State<AddPlannedActivity> {
   final _formKey = GlobalKey<FormState>();
-  final _text = TextEditingController();
-  Activity activity = PlannedActivity.nullActivity;
-  bool presetActivity = false;
+  final _textController = TextEditingController();
+
+  String activityName = '';
+  ActivityCategory activityCategory = ActivityCategory.nullCategory;
+  bool isPresetActivity = false;
+
+  bool _isActivityValid() =>
+      (activityCategory != ActivityCategory.nullCategory &&
+          (_formKey.currentState == null || _formKey.currentState!.validate()));
 
   @override
   Widget build(BuildContext context) {
@@ -116,12 +246,12 @@ class _AddPlannedActivityState extends State<AddPlannedActivity> {
                 Stack(
                   children: [
                     TextFormField(
-                      controller: _text,
+                      controller: _textController,
                       decoration: InputDecoration(
                         contentPadding: EdgeInsets.fromLTRB(8, 20, 36, 20),
                         labelText: 'Enter an activity',
                         filled: true,
-                        fillColor: activity.category.color.shade100,
+                        fillColor: activityCategory.color.shade100,
                         border: OutlineInputBorder(),
                       ),
                       validator: (String? input) {
@@ -135,10 +265,9 @@ class _AddPlannedActivityState extends State<AddPlannedActivity> {
                       },
                       onChanged: (value) {
                         setState(() {
-                          if (activity.name != value) {
-                            presetActivity = false;
-                            log('Valid ' +
-                                (_formKey.currentState!.validate()).toString());
+                          if (activityName != value) {
+                            isPresetActivity = false;
+                            activityName = value;
                           }
                         });
                       },
@@ -152,9 +281,9 @@ class _AddPlannedActivityState extends State<AddPlannedActivity> {
                             color: Colors.black.withOpacity(0.7)),
                         iconSize: 30,
                         onSelected: (PlannedActivity activity) => setState(() {
-                          _text.text = activity.name;
-                          this.activity = activity;
-                          presetActivity = true;
+                          _textController.text = activityName = activity.name;
+                          activityCategory = activity.category;
+                          isPresetActivity = true;
                         }),
                         itemBuilder: (context) {
                           return [
@@ -168,16 +297,16 @@ class _AddPlannedActivityState extends State<AddPlannedActivity> {
                   ],
                 ),
                 DropdownButtonFormField<ActivityCategory>(
-                  value: (activity.category == ActivityCategory.nullCategory
+                  value: (activityCategory == ActivityCategory.nullCategory
                       ? null
-                      : activity.category),
+                      : activityCategory),
                   icon: const Icon(Icons.arrow_drop_down_circle_outlined),
                   iconEnabledColor: Colors.black.withOpacity(0.6),
                   iconDisabledColor: Colors.black.withOpacity(0.3),
                   iconSize: 30,
                   decoration: InputDecoration(
                     filled: true,
-                    fillColor: activity.category.color.shade400,
+                    fillColor: activityCategory.color.shade400,
                     border: OutlineInputBorder(),
                   ),
                   items: [
@@ -185,12 +314,11 @@ class _AddPlannedActivityState extends State<AddPlannedActivity> {
                       DropdownMenuItem<ActivityCategory>(
                           value: category, child: Text(category.name))
                   ],
-                  onChanged: presetActivity
+                  onChanged: isPresetActivity
                       ? null
                       : (category) => setState(
                             () {
-                              activity =
-                                  PlannedActivity(activity.name, category!);
+                              activityCategory = category!;
                             },
                           ),
                 )
@@ -207,12 +335,12 @@ class _AddPlannedActivityState extends State<AddPlannedActivity> {
             child: const Text('CANCEL'),
           ),
           TextButton(
-            onPressed: (activity != PlannedActivity.nullActivity &&
-                    (_formKey.currentState == null ||
-                        _formKey.currentState!.validate()))
+            onPressed: _isActivityValid()
                 ? () {
-                    // TODO Add new activity
-                    Navigator.of(context).pop();
+                    final activity =
+                        PlannedActivity(activityName, activityCategory);
+                    ActivityAdder(
+                        mediator: widget.mediator, activity: activity);
                   }
                 : null,
             child: const Text('ADD'),
@@ -225,50 +353,19 @@ class _AddPlannedActivityState extends State<AddPlannedActivity> {
   @override
   void dispose() {
     super.dispose();
-    _text.dispose();
+    _textController.dispose();
   }
 }
 
-@immutable
-class _TrackedPair {
-  const _TrackedPair(this.index, this.mood);
+class ActivityListView extends StatelessWidget {
+  final PlannerMediator mediator;
 
-  final int index;
-  final Mood mood;
-}
-
-class ActivityList extends StatefulWidget {
-  List<Activity> activities = [
-    for (int i = 0; i < 50; ++i) presetActivitiesList[i % 7]
-  ];
-
-  @override
-  State<ActivityList> createState() => _ActivityListState();
-}
-
-class _ActivityListState extends State<ActivityList> {
-  final _trackNotifier =
-      ValueNotifier<_TrackedPair>(_TrackedPair(-1, Mood.nullMood));
-
-  @override
-  void initState() {
-    super.initState();
-    _trackNotifier.addListener(() {
-      final index = _trackNotifier.value.index;
-      final mood = _trackNotifier.value.mood;
-
-      final activity = widget.activities[index] as PlannedActivity;
-      final newActivity = TrackedActivity(activity, mood);
-
-      setState(() {
-        widget.activities.insert(index, newActivity);
-        widget.activities.removeAt(index + 1);
-      });
-    });
-  }
+  ActivityListView({required this.mediator});
 
   @override
   Widget build(BuildContext context) {
+    var activities = mediator.activities;
+
     return Scrollbar(
       isAlwaysShown: true,
       child: Stack(
@@ -280,7 +377,7 @@ class _ActivityListState extends State<ActivityList> {
                 end: Alignment.bottomRight,
 
                 /// TODO make gradient follow dragged list item
-                colors: [Colors.blue, Colors.red],
+                colors: [Colors.green.shade400, Colors.blue.shade400],
               ),
             ),
             child: Container(),
@@ -290,30 +387,25 @@ class _ActivityListState extends State<ActivityList> {
                 canvasColor: Colors.transparent,
                 shadowColor: Colors.transparent),
             child: ReorderableListView.builder(
+              /// TODO make restoration stack work
               restorationId: 'activitiesList',
-              onReorder: (oldIndex, newIndex) {
-                final replace = widget.activities.removeAt(oldIndex);
-                if (oldIndex > newIndex) {
-                  widget.activities.insert(math.max(0, newIndex), replace);
-                } else {
-                  widget.activities.insert(newIndex - 1, replace);
-                }
-              },
-              itemCount: widget.activities.length,
-              itemBuilder: (context, index) {
-                final activity = widget.activities[index];
+              onReorder: (oldIndex, newIndex) => ActivityReorderer(
+                  mediator: mediator, oldIndex: oldIndex, newIndex: newIndex),
+              itemCount: activities.length,
+              itemBuilder: (BuildContext context, int index) {
+                final activity = activities[index];
                 final Color thisColor = activity.category.color.shade100;
                 final Color? lastColor = (index - 1 >= 0)
-                    ? widget.activities[index - 1].category.color.shade100
+                    ? activities[index - 1].category.color.shade100
                     : null;
-                final Color? nextColor = (index + 1 < widget.activities.length)
-                    ? widget.activities[index + 1].category.color.shade100
+                final Color? nextColor = (index + 1 < activities.length)
+                    ? activities[index + 1].category.color.shade100
                     : null;
                 LinearGradient gradient;
 
                 if (index == 0) {
-                  if (widget.activities.length == 1) {
-                    gradient = LinearGradient(colors: [thisColor]);
+                  if (activities.length == 1) {
+                    gradient = LinearGradient(colors: [thisColor, thisColor]);
                   } else {
                     gradient = LinearGradient(
                         begin: Alignment.topCenter,
@@ -323,7 +415,7 @@ class _ActivityListState extends State<ActivityList> {
                           Color.lerp(thisColor, nextColor, 0.5)!
                         ]);
                   }
-                } else if (index == widget.activities.length - 1) {
+                } else if (index == activities.length - 1) {
                   gradient = LinearGradient(
                       begin: Alignment.topCenter,
                       end: Alignment.bottomCenter,
@@ -342,29 +434,18 @@ class _ActivityListState extends State<ActivityList> {
                       ]);
                 }
 
-                if (activity is TrackedActivity) {
-                  log('Tracking works');
-                }
-
                 return ActivityListItem(
-                  key: ValueKey(index),
-                  index: index,
-                  activity: activity,
-                  gradient: gradient,
-                  trackNotifier: _trackNotifier,
-                );
+                    key: ValueKey(index),
+                    index: index,
+                    activity: activity,
+                    gradient: gradient,
+                    mediator: mediator);
               },
             ),
           ),
         ],
       ),
     );
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
-    _trackNotifier.dispose();
   }
 }
 
@@ -374,13 +455,13 @@ class ActivityListItem extends StatelessWidget {
       required this.activity,
       required this.index,
       required this.gradient,
-      required this.trackNotifier})
+      required this.mediator})
       : super(key: key);
 
   final Activity activity;
   final int index;
   final Gradient gradient;
-  final ValueNotifier trackNotifier;
+  final PlannerMediator mediator;
 
   @override
   Widget build(BuildContext context) {
@@ -424,7 +505,7 @@ class ActivityListItem extends StatelessWidget {
                           builder: (context) => MoodRater(
                             activity: activity,
                             index: index,
-                            trackNotifier: trackNotifier,
+                            mediator: mediator,
                           ),
                         );
                       },
@@ -433,6 +514,7 @@ class ActivityListItem extends StatelessWidget {
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 12.0),
                       child: Material(
+                        elevation: 2,
                         shape: CircleBorder(),
                         color:
                             (activity as TrackedActivity).mood.color.shade400,
@@ -451,18 +533,17 @@ class ActivityListItem extends StatelessWidget {
   }
 }
 
-@immutable
 class MoodRater extends StatefulWidget {
   const MoodRater({
     Key? key,
     required this.activity,
     required this.index,
-    required this.trackNotifier,
+    required this.mediator,
   }) : super(key: key);
 
   final Activity activity;
   final int index;
-  final ValueNotifier trackNotifier;
+  final PlannerMediator mediator;
 
   @override
   State<MoodRater> createState() => _MoodRaterState();
@@ -471,7 +552,7 @@ class MoodRater extends StatefulWidget {
 /// TODO animate color change
 
 class _MoodRaterState extends State<MoodRater> {
-  Mood selected = Mood.nullMood;
+  Mood selectedMood = Mood.nullMood;
 
   @override
   Widget build(BuildContext context) {
@@ -500,7 +581,7 @@ class _MoodRaterState extends State<MoodRater> {
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   border: Border.all(color: mood.color.shade400, width: 4),
-                  color: selected == mood
+                  color: selectedMood == mood
                       ? mood.color.shade400
                       : mood.color.shade50,
                 ),
@@ -510,9 +591,8 @@ class _MoodRaterState extends State<MoodRater> {
                     splashColor: mood.color.shade300,
                     customBorder: CircleBorder(),
                     onTap: () {
-                      log(mood.name);
                       setState(() {
-                        selected = mood;
+                        selectedMood = mood;
                       });
                     },
                     child: Padding(
@@ -534,8 +614,11 @@ class _MoodRaterState extends State<MoodRater> {
         ),
         TextButton(
           onPressed: () {
+            MoodTracker(
+                mediator: widget.mediator,
+                index: widget.index,
+                mood: selectedMood);
             Navigator.of(context).pop();
-            widget.trackNotifier.value = _TrackedPair(widget.index, selected);
           },
           child: const Text('Track'),
         ),
