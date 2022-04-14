@@ -143,7 +143,7 @@ class _PlannerState extends State<Planner> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      drawer: sideDrawerLeft(),
+      drawer: const sideDrawerLeft(),
       resizeToAvoidBottomInset: false,
       appBar: AppBar(
         title: const Text('Planner'),
@@ -173,27 +173,28 @@ class _PlannerState extends State<Planner> {
 }
 
 class PlannerFab extends StatelessWidget {
-  final _closeFabNotifier = BasicNotifier();
   final PlannerMediator mediator;
 
   PlannerFab({required this.mediator});
 
   @override
   Widget build(BuildContext context) {
+    final closeFabNotifier = BasicNotifier();
+
     return ExpandableFab(
       distance: 112,
-      closeFab: _closeFabNotifier,
+      closeFab: closeFabNotifier,
       children: [
         ActionButton(
           icon: Icon(Icons.schedule),
           color: Colors.teal,
-          onPressed: () => _closeFabNotifier.notify(),
+          onPressed: () => closeFabNotifier.notify(),
         ),
         ActionButton(
           icon: Icon(Icons.check_circle_outline),
           color: Colors.green,
           onPressed: () {
-            _closeFabNotifier.notify();
+            closeFabNotifier.notify();
           },
         ),
         ActionButton(
