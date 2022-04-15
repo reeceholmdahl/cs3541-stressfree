@@ -1,4 +1,3 @@
-import 'package:firstapp/youtubeStress.dart';
 import 'package:flutter/material.dart';
 
 import '../drawer.dart';
@@ -11,15 +10,11 @@ class homePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Stress Free',
-      home: MyHomePage()
-    );
+    return MaterialApp(title: 'Stress Free', home: MyHomePage());
   }
 }
 
 class MyHomePage extends StatelessWidget {
-
   Widget buildHomePage(BuildContext context) {
     return homeTab(
       sideDrawer: sideDrawerLeft(),
@@ -31,7 +26,3 @@ class MyHomePage extends StatelessWidget {
     return buildHomePage(context);
   }
 }
-
-
-
-

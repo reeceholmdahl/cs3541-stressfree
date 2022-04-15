@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 
@@ -9,20 +8,17 @@ class VideoList extends StatefulWidget {
 }
 
 class _VideoListState extends State<VideoList> {
-  final List<YoutubePlayerController> _controllers = [
-    'i-pazYyLSWQ',
-    'inpok4MKVLM',
-    'ZToicYcHIOU'
-  ]
-      .map<YoutubePlayerController>(
-        (videoId) => YoutubePlayerController(
-      initialVideoId: videoId,
-      flags: const YoutubePlayerFlags(
-        autoPlay: false,
-      ),
-    ),
-  )
-      .toList();
+  final List<YoutubePlayerController> _controllers =
+      ['i-pazYyLSWQ', 'inpok4MKVLM', 'ZToicYcHIOU']
+          .map<YoutubePlayerController>(
+            (videoId) => YoutubePlayerController(
+              initialVideoId: videoId,
+              flags: const YoutubePlayerFlags(
+                autoPlay: false,
+              ),
+            ),
+          )
+          .toList();
 
   @override
   Widget build(BuildContext context) {

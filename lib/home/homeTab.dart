@@ -1,11 +1,9 @@
 import 'package:firstapp/home/utils.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import 'clickDirector.dart';
 
 class homeTab extends StatefulWidget {
-
   static const title = 'Home';
 
   const homeTab({Key? key, this.sideDrawer}) : super(key: key);
@@ -13,7 +11,6 @@ class homeTab extends StatefulWidget {
 
   @override
   homeTabState createState() => homeTabState();
-
 }
 
 class homeTabState extends State<homeTab> {
@@ -24,25 +21,24 @@ class homeTabState extends State<homeTab> {
 
   Widget itemBuilder(BuildContext context, int index) {
     return SafeArea(
-        top: false,
-        bottom: false,
-        child: Hero(
-          tag: index,
-          child: tile(
-            name: tileNames[index],
-            color: colors[index],
-            //image: images[index],
-            transitionAnimation: const AlwaysStoppedAnimation(0),
-            onPressed: () =>
-                Navigator.of(context).push<void>(
-                  MaterialPageRoute(
-                    builder: (context) => clickDirector(
-                          id: index,
-                        ),
-                  ), // Where the click will lead you. Implement from here
-                ),
+      top: false,
+      bottom: false,
+      child: Hero(
+        tag: index,
+        child: tile(
+          name: tileNames[index],
+          color: colors[index],
+          //image: images[index],
+          transitionAnimation: const AlwaysStoppedAnimation(0),
+          onPressed: () => Navigator.of(context).push<void>(
+            MaterialPageRoute(
+              builder: (context) => clickDirector(
+                id: index,
+              ),
+            ), // Where the click will lead you. Implement from here
           ),
         ),
+      ),
     );
   }
 
@@ -53,9 +49,9 @@ class homeTabState extends State<homeTab> {
       ),
       drawer: widget.sideDrawer,
       body: ListView.builder(
-            itemCount: homePageItemsList.length,
-            itemBuilder: itemBuilder,
-        ),
+        itemCount: homePageItemsList.length,
+        itemBuilder: itemBuilder,
+      ),
     );
   }
 
@@ -64,8 +60,6 @@ class homeTabState extends State<homeTab> {
     return buildPage(context);
   }
 }
-
-
 
 /*
 Allows for each tile to have an animation
@@ -94,9 +88,8 @@ class PressableCard extends StatefulWidget {
 
   @override
   State<StatefulWidget> createState() => _PressableCardState();
-
-
 }
+
 /*
 From Book
 */
@@ -141,21 +134,19 @@ class _PressableCardState extends State<PressableCard>
         onTap: () {
           widget.onPressed?.call();
         },
-
         child: AnimatedBuilder(
           animation:
-          Listenable.merge([elevationAnimation, widget.flattenAnimation]),
+              Listenable.merge([elevationAnimation, widget.flattenAnimation]),
           child: widget.child,
           builder: (context, child) {
             return Transform.scale(
               scale: 1 - elevationAnimation.value * 0.03,
               child: Padding(
                 padding:
-                const EdgeInsets.symmetric(vertical: 16, horizontal: 16) *
-                    flatten,
+                    const EdgeInsets.symmetric(vertical: 16, horizontal: 16) *
+                        flatten,
                 child: PhysicalModel(
-                  elevation:
-                  ((1 - elevationAnimation.value) * 20) * flatten,
+                  elevation: ((1 - elevationAnimation.value) * 20) * flatten,
                   borderRadius: BorderRadius.circular(120 * flatten),
                   clipBehavior: Clip.antiAlias,
                   color: widget.color,
@@ -174,8 +165,6 @@ class _PressableCardState extends State<PressableCard>
 Used for creation of each tile
 */
 class tile extends StatelessWidget {
-
-
   const tile({
     required this.name,
     required this.color,
@@ -189,8 +178,8 @@ class tile extends StatelessWidget {
   final Color color;
   //final String image;
   final VoidCallback? onPressed;
-  final Animation<double> transitionAnimation; //not going to use, but can do later
-
+  final Animation<double>
+      transitionAnimation; //not going to use, but can do later
 
   @override
   Widget build(context) {
@@ -233,6 +222,3 @@ class tile extends StatelessWidget {
     );
   }
 }
-
-
-

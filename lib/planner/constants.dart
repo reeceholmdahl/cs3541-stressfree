@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 
-import 'package:firstapp/data/activity_category.dart';
-import 'package:firstapp/data/planned_activity.dart';
+import 'package:firstapp/model/activity_category.dart';
+import 'package:firstapp/model/planned_activity.dart';
 
-// TODO eventually all these these should be moved to the database
+// TODO eventually all these these should be moved to the database as the user can add their own custom presets and categories
 
 final presetActivities = {
   'drank water':

@@ -1,6 +1,7 @@
-import 'package:flutter/material.dart';
-import 'package:firstapp/data/mood.dart';
-import 'package:firstapp/data/planned_activity.dart';
+import 'package:flutter/foundation.dart';
+import 'activity.dart';
+import 'mood.dart';
+import 'planned_activity.dart';
 
 @immutable
 class TrackedActivity extends Activity {
@@ -16,7 +17,4 @@ class TrackedActivity extends Activity {
   }
 
   const TrackedActivity(this.activity, this.mood);
-
-  static final nullActivity =
-      TrackedActivity(PlannedActivity.nullActivity, Mood.nullMood);
 }

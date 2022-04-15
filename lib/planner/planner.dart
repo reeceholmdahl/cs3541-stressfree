@@ -1,137 +1,20 @@
 import 'dart:developer';
 
-import 'package:firstapp/planner/constants.dart';
-import 'package:firstapp/planner/custom_icon_button.dart';
 import 'package:flutter/material.dart';
 
 import 'package:firstapp/drawer.dart';
-import 'package:firstapp/data/mood.dart';
-import 'package:firstapp/data/activity_category.dart';
-import 'package:firstapp/data/planned_activity.dart';
-import 'package:firstapp/data/tracked_activity.dart';
+import 'package:firstapp/planner/constants.dart';
+import 'package:firstapp/planner/custom_icon_button.dart';
 
+import 'package:firstapp/model/activity.dart';
+import 'package:firstapp/model/mood.dart';
+import 'package:firstapp/model/activity_category.dart';
+import 'package:firstapp/model/planned_activity.dart';
+import 'package:firstapp/model/tracked_activity.dart';
+
+import 'planner_model.dart';
 import 'planner_settings.dart';
 import 'expandable_fab.dart';
-
-class PlannerMediator {
-  final List<Activity> activities = [];
-  final notifier = BasicNotifier();
-
-  dynamic _sender;
-
-  void notify(sender) {
-    _sender = sender;
-
-    log('notify: ' + sender.runtimeType.toString());
-
-    if (sender is ActivityAdder) {
-      log('notify: _onAddActivity');
-      _onAddActivity();
-    } else if (sender is ActivityRemover) {
-      log('notify: _onRemoveActivity');
-      _onRemoveActivity();
-    } else if (sender is MoodTracker) {
-      log('notify: _onTrackActivity');
-      _onTrackActivity();
-    } else if (sender is ActivityReorderer) {
-      log('notify: _onReorderActivity');
-      _onReorderActivity();
-    }
-  }
-
-  void _onAddActivity() {
-    assert(_sender is ActivityAdder);
-
-    final sender = _sender as ActivityAdder;
-    activities.insert(0, sender.activity);
-
-    notifier.notify();
-  }
-
-  void _onRemoveActivity() {
-    assert(_sender is ActivityRemover);
-
-    final sender = _sender as ActivityRemover;
-    activities.removeAt(sender.index);
-
-    notifier.notify();
-  }
-
-  void _onTrackActivity() {
-    assert(_sender is MoodTracker);
-
-    final sender = _sender as MoodTracker;
-
-    assert(activities[sender.index] is PlannedActivity);
-
-    activities.insert(
-        sender.index,
-        new TrackedActivity(
-            activities[sender.index] as PlannedActivity, sender.mood));
-
-    activities.removeAt(sender.index + 1);
-
-    notifier.notify();
-  }
-
-  void _onReorderActivity() {
-    assert(_sender is ActivityReorderer);
-
-    final sender = _sender as ActivityReorderer;
-
-    int newIndex = sender.newIndex;
-    if (sender.oldIndex < newIndex) {
-      newIndex -= 1;
-    }
-    final Activity activity = activities.removeAt(sender.oldIndex);
-    activities.insert(newIndex, activity);
-  }
-}
-
-class ActivityAdder {
-  final Activity activity;
-
-  ActivityAdder({required PlannerMediator mediator, required this.activity}) {
-    mediator.notify(this);
-  }
-}
-
-class ActivityRemover {
-  final int index;
-
-  ActivityRemover({required PlannerMediator mediator, required this.index}) {
-    mediator.notify(this);
-  }
-}
-
-class MoodTracker {
-  final int index;
-  final Mood mood;
-
-  MoodTracker(
-      {required PlannerMediator mediator,
-      required this.index,
-      required this.mood}) {
-    mediator.notify(this);
-  }
-}
-
-class ActivityReorderer {
-  final int oldIndex, newIndex;
-
-  ActivityReorderer(
-      {required PlannerMediator mediator,
-      required this.oldIndex,
-      required this.newIndex}) {
-    mediator.notify(this);
-  }
-}
-
-class BasicNotifier with ChangeNotifier {
-  void notify() {
-    notifyListeners();
-  }
-}
 
 class Planner extends StatefulWidget {
   @override
@@ -238,16 +121,20 @@ class _AddActivityDialogState<T extends Activity>
   bool _isActivityValid() => (activityCategory !=
           ActivityCategory.nullCategory &&
       (_formKey.currentState == null || _formKey.currentState!.validate()) &&
-      (T == TrackedActivity ? moodRater!.selectedMood != Mood.nullMood : true));
+      (T == TrackedActivity
+          ? moodRater!.selectedMood() != Mood.nullMood
+          : true));
 
   void _addActivity() {
     var plannedActivity = PlannedActivity(activityName, activityCategory);
-    Activity activity = PlannedActivity.nullActivity;
+    Activity activity = NullActivity();
 
     if (T == PlannedActivity)
       activity = plannedActivity;
     else if (T == TrackedActivity)
-      activity = TrackedActivity(plannedActivity, moodRater!.selectedMood);
+      activity = TrackedActivity(plannedActivity, moodRater!.selectedMood());
+
+    assert(activity is! NullActivity);
 
     ActivityAdder(mediator: widget.mediator, activity: activity);
     Navigator.pop(context);
@@ -386,13 +273,12 @@ class _AddActivityDialogState<T extends Activity>
 
 class ActivityListView extends StatelessWidget {
   final PlannerMediator mediator;
-  late List<Activity> activities;
 
   ActivityListView({required this.mediator});
 
   @override
   Widget build(BuildContext context) {
-    activities = mediator.activities;
+    final activities = mediator.activities;
 
     return Scrollbar(
       isAlwaysShown: true,
@@ -427,7 +313,7 @@ class ActivityListView extends StatelessWidget {
                     key: ValueKey(index),
                     index: index,
                     activity: activity,
-                    gradient: _makeGradient(index),
+                    gradient: _makeGradient(index, activities),
                     mediator: mediator);
               },
             ),
@@ -437,7 +323,7 @@ class ActivityListView extends StatelessWidget {
     );
   }
 
-  LinearGradient _makeGradient(int index) {
+  LinearGradient _makeGradient(int index, List<Activity> activities) {
     final activity = activities[index];
 
     final Color thisColor = activity.category.color.shade100;
@@ -553,6 +439,8 @@ class ActivityListItem extends StatelessWidget {
   }
 }
 
+/// TODO bug where when deleting an activity list item it stays at the same index even if the activity was moved
+/// TODO bug also when deleting an activity, the next one to shift down to the index will also be in delete mode
 class ActivityListItemActionIcon extends StatefulWidget {
   final PlannerMediator mediator;
   final VoidCallback? onPressed;
@@ -614,10 +502,13 @@ class _ActivityListItemActionIconState
 }
 
 class MoodRater extends StatefulWidget {
-  Mood selectedMood = Mood.nullMood;
+  // Mood selectedMood = Mood.nullMood;
+  final _notifier = ValueNotifier<Mood>(Mood.nullMood);
   final VoidCallback onPressed;
 
   MoodRater({required this.onPressed});
+
+  Mood selectedMood() => _notifier.value;
 
   @override
   State<MoodRater> createState() => _MoodRaterState();
@@ -634,7 +525,7 @@ class _MoodRaterState extends State<MoodRater> {
             decoration: BoxDecoration(
               shape: BoxShape.circle,
               border: Border.all(color: mood.color.shade300, width: 3),
-              color: widget.selectedMood == mood
+              color: widget._notifier.value == mood
                   ? mood.color.shade300
                   : mood.color.shade50,
             ),
@@ -647,7 +538,7 @@ class _MoodRaterState extends State<MoodRater> {
                 onTap: () {
                   widget.onPressed();
                   setState(() {
-                    widget.selectedMood = mood;
+                    widget._notifier.value = mood;
                   });
                 },
                 child: Padding(
@@ -708,7 +599,9 @@ class MoodRaterDialog extends StatelessWidget {
         TextButton(
           onPressed: () {
             MoodTracker(
-                mediator: mediator, index: index, mood: moodRater.selectedMood);
+                mediator: mediator,
+                index: index,
+                mood: moodRater.selectedMood());
             Navigator.of(context).pop();
           },
           child: const Text('Track'),
