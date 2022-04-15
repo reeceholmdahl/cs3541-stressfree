@@ -1,14 +1,15 @@
 import 'dart:developer';
 
-import 'package:firstapp/data/activity_category.dart';
+import 'package:firstapp/planner/constants.dart';
+import 'package:firstapp/planner/custom_icon_button.dart';
 import 'package:flutter/material.dart';
 
 import 'package:firstapp/drawer.dart';
+import 'package:firstapp/data/mood.dart';
+import 'package:firstapp/data/activity_category.dart';
 import 'package:firstapp/data/planned_activity.dart';
 import 'package:firstapp/data/tracked_activity.dart';
-import 'package:firstapp/data/mood.dart';
 
-import 'constants.dart';
 import 'planner_settings.dart';
 import 'expandable_fab.dart';
 
@@ -193,58 +194,82 @@ class PlannerFab extends StatelessWidget {
         ActionButton(
           icon: Icon(Icons.check_circle_outline),
           color: Colors.green,
-          onPressed: () {
-            closeFabNotifier.notify();
-          },
+          onPressed: () => showDialog<void>(
+            context: context,
+            builder: (context) {
+              return AddActivityDialog<TrackedActivity>(mediator: mediator);
+            },
+          ),
         ),
         ActionButton(
           icon: Icon(Icons.calendar_month),
           color: Colors.blue,
           onPressed: () => showDialog<void>(
-              context: context,
-              builder: (context) {
-                return AddPlannedActivity(mediator: mediator);
-              }),
+            context: context,
+            builder: (context) {
+              return AddActivityDialog<PlannedActivity>(mediator: mediator);
+            },
+          ),
         )
       ],
     );
   }
 }
 
-class AddPlannedActivity extends StatefulWidget {
+class AddActivityDialog<T extends Activity> extends StatefulWidget {
   final PlannerMediator mediator;
 
-  AddPlannedActivity({required this.mediator});
+  AddActivityDialog({required this.mediator});
 
   @override
-  State<AddPlannedActivity> createState() => _AddPlannedActivityState();
+  State<AddActivityDialog<T>> createState() => _AddActivityDialogState<T>();
 }
 
-class _AddPlannedActivityState extends State<AddPlannedActivity> {
+class _AddActivityDialogState<T extends Activity>
+    extends State<AddActivityDialog<T>> {
   final _formKey = GlobalKey<FormState>();
   final _textController = TextEditingController();
+  MoodRater? moodRater;
 
   String activityName = '';
   ActivityCategory activityCategory = ActivityCategory.nullCategory;
   bool isPresetActivity = false;
 
-  bool _isActivityValid() =>
-      (activityCategory != ActivityCategory.nullCategory &&
-          (_formKey.currentState == null || _formKey.currentState!.validate()));
+  bool _isActivityValid() => (activityCategory !=
+          ActivityCategory.nullCategory &&
+      (_formKey.currentState == null || _formKey.currentState!.validate()) &&
+      (T == TrackedActivity ? moodRater!.selectedMood != Mood.nullMood : true));
+
+  void _addActivity() {
+    var plannedActivity = PlannedActivity(activityName, activityCategory);
+    Activity activity = PlannedActivity.nullActivity;
+
+    if (T == PlannedActivity)
+      activity = plannedActivity;
+    else if (T == TrackedActivity)
+      activity = TrackedActivity(plannedActivity, moodRater!.selectedMood);
+
+    ActivityAdder(mediator: widget.mediator, activity: activity);
+    Navigator.pop(context);
+  }
 
   @override
   Widget build(BuildContext context) {
+    if (moodRater == null) {
+      moodRater = MoodRater(onPressed: () => setState(() {}));
+    }
+
     return Form(
       key: _formKey,
       child: AlertDialog(
-        content: SizedBox(
-          height: 160,
-          child: SizedBox(
-            width: double.maxFinite,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Stack(
+        content: Container(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Flexible(
+                flex: 5,
+                child: Stack(
                   children: [
                     TextFormField(
                       controller: _textController,
@@ -297,7 +322,11 @@ class _AddPlannedActivityState extends State<AddPlannedActivity> {
                     )
                   ],
                 ),
-                DropdownButtonFormField<ActivityCategory>(
+              ),
+              Spacer(flex: 1),
+              Flexible(
+                flex: 5,
+                child: DropdownButtonFormField<ActivityCategory>(
                   value: (activityCategory == ActivityCategory.nullCategory
                       ? null
                       : activityCategory),
@@ -322,9 +351,13 @@ class _AddPlannedActivityState extends State<AddPlannedActivity> {
                               activityCategory = category!;
                             },
                           ),
-                )
+                ),
+              ),
+              if (T == TrackedActivity) ...[
+                Spacer(flex: 1),
+                Flexible(flex: 5, child: moodRater!)
               ],
-            ),
+            ],
           ),
         ),
         actionsAlignment: MainAxisAlignment.spaceBetween,
@@ -336,14 +369,7 @@ class _AddPlannedActivityState extends State<AddPlannedActivity> {
             child: const Text('CANCEL'),
           ),
           TextButton(
-            onPressed: _isActivityValid()
-                ? () {
-                    final activity =
-                        PlannedActivity(activityName, activityCategory);
-                    ActivityAdder(
-                        mediator: widget.mediator, activity: activity);
-                  }
-                : null,
+            onPressed: _isActivityValid() ? _addActivity : null,
             child: const Text('ADD'),
           ),
         ],
@@ -360,12 +386,13 @@ class _AddPlannedActivityState extends State<AddPlannedActivity> {
 
 class ActivityListView extends StatelessWidget {
   final PlannerMediator mediator;
+  late List<Activity> activities;
 
   ActivityListView({required this.mediator});
 
   @override
   Widget build(BuildContext context) {
-    var activities = mediator.activities;
+    activities = mediator.activities;
 
     return Scrollbar(
       isAlwaysShown: true,
@@ -395,51 +422,12 @@ class ActivityListView extends StatelessWidget {
               itemCount: activities.length,
               itemBuilder: (BuildContext context, int index) {
                 final activity = activities[index];
-                final Color thisColor = activity.category.color.shade100;
-                final Color? lastColor = (index - 1 >= 0)
-                    ? activities[index - 1].category.color.shade100
-                    : null;
-                final Color? nextColor = (index + 1 < activities.length)
-                    ? activities[index + 1].category.color.shade100
-                    : null;
-                LinearGradient gradient;
-
-                if (index == 0) {
-                  if (activities.length == 1) {
-                    gradient = LinearGradient(colors: [thisColor, thisColor]);
-                  } else {
-                    gradient = LinearGradient(
-                        begin: Alignment.topCenter,
-                        end: Alignment.bottomCenter,
-                        colors: [
-                          thisColor,
-                          Color.lerp(thisColor, nextColor, 0.5)!
-                        ]);
-                  }
-                } else if (index == activities.length - 1) {
-                  gradient = LinearGradient(
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter,
-                      colors: [
-                        Color.lerp(lastColor, thisColor, 0.5)!,
-                        thisColor,
-                      ]);
-                } else {
-                  gradient = LinearGradient(
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter,
-                      colors: [
-                        Color.lerp(lastColor, thisColor, 0.5)!,
-                        thisColor,
-                        Color.lerp(thisColor, nextColor, 0.5)!,
-                      ]);
-                }
 
                 return ActivityListItem(
                     key: ValueKey(index),
                     index: index,
                     activity: activity,
-                    gradient: gradient,
+                    gradient: _makeGradient(index),
                     mediator: mediator);
               },
             ),
@@ -447,6 +435,47 @@ class ActivityListView extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  LinearGradient _makeGradient(int index) {
+    final activity = activities[index];
+
+    final Color thisColor = activity.category.color.shade100;
+    final Color? lastColor =
+        (index - 1 >= 0) ? activities[index - 1].category.color.shade100 : null;
+    final Color? nextColor = (index + 1 < activities.length)
+        ? activities[index + 1].category.color.shade100
+        : null;
+
+    LinearGradient gradient;
+    if (index == 0) {
+      if (activities.length == 1) {
+        gradient = LinearGradient(colors: [thisColor, thisColor]);
+      } else {
+        gradient = LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [thisColor, Color.lerp(thisColor, nextColor, 0.5)!]);
+      }
+    } else if (index == activities.length - 1) {
+      gradient = LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: [
+            Color.lerp(lastColor, thisColor, 0.5)!,
+            thisColor,
+          ]);
+    } else {
+      gradient = LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: [
+            Color.lerp(lastColor, thisColor, 0.5)!,
+            thisColor,
+            Color.lerp(thisColor, nextColor, 0.5)!,
+          ]);
+    }
+    return gradient;
   }
 }
 
@@ -477,11 +506,9 @@ class ActivityListItem extends StatelessWidget {
             borderRadius: const BorderRadius.all(Radius.circular(8)),
             color: activity.category.color.shade300,
             child: InkWell(
+              onDoubleTap: () {},
               borderRadius: const BorderRadius.all(Radius.circular(8)),
               splashColor: activity.category.color.shade200,
-              onDoubleTap: () {
-                log('Double tap');
-              },
               child: Row(
                 children: [
                   Padding(
@@ -495,15 +522,14 @@ class ActivityListItem extends StatelessWidget {
                       child: Text(activity.name,
                           style: theme.textTheme.subtitle1)),
                   if (activity is PlannedActivity)
-                    IconButton(
-                      splashColor: activity.category.color.shade200,
-                      icon: Icon(Icons.radio_button_unchecked,
-                          color: Colors.black.withOpacity(0.7)),
-                      padding: const EdgeInsets.symmetric(horizontal: 12),
+                    ActivityListItemActionIcon(
+                      mediator: mediator,
+                      activity: activity,
+                      index: index,
                       onPressed: () {
                         showDialog(
                           context: context,
-                          builder: (context) => MoodRater(
+                          builder: (context) => MoodRaterDialog(
                             activity: activity,
                             index: index,
                             mediator: mediator,
@@ -512,18 +538,11 @@ class ActivityListItem extends StatelessWidget {
                       },
                     )
                   else
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 12.0),
-                      child: Material(
-                        elevation: 2,
-                        shape: CircleBorder(),
-                        color:
-                            (activity as TrackedActivity).mood.color.shade400,
-                        child: Icon(
-                          (activity as TrackedActivity).mood.iconData,
-                        ),
-                      ),
-                    ),
+                    ActivityListItemActionIcon(
+                        mediator: mediator,
+                        onPressed: null,
+                        activity: activity,
+                        index: index),
                 ],
               ),
             ),
@@ -534,8 +553,118 @@ class ActivityListItem extends StatelessWidget {
   }
 }
 
+class ActivityListItemActionIcon extends StatefulWidget {
+  final PlannerMediator mediator;
+  final VoidCallback? onPressed;
+  final Activity activity;
+  final int index;
+
+  final deleteIcon = Icon(Icons.delete, color: Colors.black.withOpacity(0.7));
+
+  ActivityListItemActionIcon(
+      {required this.mediator,
+      required this.onPressed,
+      required this.activity,
+      required this.index});
+
+  @override
+  State<ActivityListItemActionIcon> createState() =>
+      _ActivityListItemActionIconState();
+}
+
+class _ActivityListItemActionIconState
+    extends State<ActivityListItemActionIcon> {
+  bool deleteMode = false;
+
+  void _onLongPress() {
+    log('Delete mode!');
+    setState(() {
+      deleteMode = true;
+    });
+  }
+
+  void _onDelete() {
+    ActivityRemover(mediator: widget.mediator, index: widget.index);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    var icon = deleteMode
+        ? widget.deleteIcon
+        : Material(
+            elevation: 2,
+            shape: CircleBorder(),
+            color: (widget.activity is TrackedActivity)
+                ? (widget.activity as TrackedActivity).mood.color.shade300
+                : widget.activity.category.color.shade300,
+            child: (widget.activity is TrackedActivity)
+                ? Icon((widget.activity as TrackedActivity).mood.iconData,
+                    color: Colors.black.withOpacity(0.7))
+                : Icon(Icons.radio_button_unchecked,
+                    color: Colors.black.withOpacity(0.7)),
+          );
+
+    return CustomIconButton(
+      onPressed: deleteMode ? _onDelete : widget.onPressed,
+      onLongPress: _onLongPress,
+      icon: icon,
+      splashColor: widget.activity.category.color.shade200,
+    );
+  }
+}
+
 class MoodRater extends StatefulWidget {
-  const MoodRater({
+  Mood selectedMood = Mood.nullMood;
+  final VoidCallback onPressed;
+
+  MoodRater({required this.onPressed});
+
+  @override
+  State<MoodRater> createState() => _MoodRaterState();
+}
+
+class _MoodRaterState extends State<MoodRater> {
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      children: [
+        for (var mood in Mood.moods.values)
+          DecoratedBox(
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              border: Border.all(color: mood.color.shade300, width: 3),
+              color: widget.selectedMood == mood
+                  ? mood.color.shade300
+                  : mood.color.shade50,
+            ),
+            child: Material(
+              color: Colors.transparent,
+              shape: CircleBorder(),
+              child: InkWell(
+                splashColor: mood.color.shade200,
+                customBorder: CircleBorder(),
+                onTap: () {
+                  widget.onPressed();
+                  setState(() {
+                    widget.selectedMood = mood;
+                  });
+                },
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Icon(mood.iconData, size: 36),
+                ),
+              ),
+            ),
+          )
+      ],
+    );
+  }
+}
+
+/// TODO animate color change
+class MoodRaterDialog extends StatelessWidget {
+  const MoodRaterDialog({
     Key? key,
     required this.activity,
     required this.index,
@@ -547,16 +676,9 @@ class MoodRater extends StatefulWidget {
   final PlannerMediator mediator;
 
   @override
-  State<MoodRater> createState() => _MoodRaterState();
-}
-
-/// TODO animate color change
-
-class _MoodRaterState extends State<MoodRater> {
-  Mood selectedMood = Mood.nullMood;
-
-  @override
   Widget build(BuildContext context) {
+    final moodRater = MoodRater(onPressed: () {});
+
     final theme = Theme.of(context);
     return AlertDialog(
       actionsAlignment: MainAxisAlignment.spaceBetween,
@@ -566,45 +688,15 @@ class _MoodRaterState extends State<MoodRater> {
           Text('Track Activity'),
           SizedBox(height: 12),
           Text(
-            widget.activity.name,
+            activity.name,
             style: theme.textTheme.subtitle1!
-                .copyWith(color: widget.activity.category.color.shade800),
+                .copyWith(color: activity.category.color.shade800),
           )
         ],
       ),
       content: SizedBox(
         width: double.maxFinite,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [
-            for (var mood in Mood.moods.values)
-              DecoratedBox(
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  border: Border.all(color: mood.color.shade400, width: 4),
-                  color: selectedMood == mood
-                      ? mood.color.shade400
-                      : mood.color.shade50,
-                ),
-                child: Material(
-                  shape: CircleBorder(),
-                  child: InkWell(
-                    splashColor: mood.color.shade300,
-                    customBorder: CircleBorder(),
-                    onTap: () {
-                      setState(() {
-                        selectedMood = mood;
-                      });
-                    },
-                    child: Padding(
-                      padding: const EdgeInsets.all(12.0),
-                      child: Icon(mood.iconData, size: 40),
-                    ),
-                  ),
-                ),
-              )
-          ],
-        ),
+        child: moodRater,
       ),
       actions: [
         TextButton(
@@ -616,9 +708,7 @@ class _MoodRaterState extends State<MoodRater> {
         TextButton(
           onPressed: () {
             MoodTracker(
-                mediator: widget.mediator,
-                index: widget.index,
-                mood: selectedMood);
+                mediator: mediator, index: index, mood: moodRater.selectedMood);
             Navigator.of(context).pop();
           },
           child: const Text('Track'),
