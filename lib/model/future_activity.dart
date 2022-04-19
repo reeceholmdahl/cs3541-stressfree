@@ -4,14 +4,6 @@ class FutureActivity extends PlannedActivity {
   final DateTime? date;
   final Recurrence? recurrence;
 
-  get name {
-    return super.name;
-  }
-
-  get category {
-    return super.category;
-  }
-
   FutureActivity({required activity, this.date, this.recurrence})
       : super(activity.name, activity.category);
 }

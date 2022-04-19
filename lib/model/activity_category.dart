@@ -6,6 +6,4 @@ class ActivityCategory {
   final MaterialColor color;
 
   const ActivityCategory(this.name, this.color);
-
-  static final nullCategory = ActivityCategory('Null', Colors.grey);
 }

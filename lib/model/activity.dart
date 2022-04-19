@@ -4,14 +4,8 @@ import 'activity_category.dart';
 
 @immutable
 abstract class Activity {
-  String get name;
-  ActivityCategory get category;
+  final String name;
+  final ActivityCategory category;
 
-  const Activity();
-}
-
-@immutable
-class NullActivity extends Activity {
-  final String name = "Null";
-  final ActivityCategory category = ActivityCategory.nullCategory;
+  const Activity(this.name, this.category);
 }

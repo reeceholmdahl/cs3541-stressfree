@@ -1,9 +1,9 @@
 import 'dart:developer';
 
+import 'package:firstapp/constants.dart';
 import 'package:flutter/material.dart';
 
 import 'package:firstapp/drawer.dart';
-import 'package:firstapp/planner/constants.dart';
 import 'package:firstapp/planner/custom_icon_button.dart';
 
 import 'package:firstapp/model/activity.dart';
@@ -115,26 +115,23 @@ class _AddActivityDialogState<T extends Activity>
   MoodRater? moodRater;
 
   String activityName = '';
-  ActivityCategory activityCategory = ActivityCategory.nullCategory;
+  ActivityCategory activityCategory = ActivityCategories.Null;
   bool isPresetActivity = false;
 
-  bool _isActivityValid() => (activityCategory !=
-          ActivityCategory.nullCategory &&
+  bool _isActivityValid() => (activityCategory != ActivityCategories.Null &&
       (_formKey.currentState == null || _formKey.currentState!.validate()) &&
-      (T == TrackedActivity
-          ? moodRater!.selectedMood() != Mood.nullMood
-          : true));
+      (T == TrackedActivity ? moodRater!.selectedMood() != Moods.Null : true));
 
   void _addActivity() {
     var plannedActivity = PlannedActivity(activityName, activityCategory);
-    Activity activity = NullActivity();
+    Activity activity = PresetActivities.Null;
 
     if (T == PlannedActivity)
       activity = plannedActivity;
     else if (T == TrackedActivity)
       activity = TrackedActivity(plannedActivity, moodRater!.selectedMood());
 
-    assert(activity is! NullActivity);
+    assert(activity != PresetActivities.Null);
 
     ActivityAdder(mediator: widget.mediator, activity: activity);
     Navigator.pop(context);
@@ -200,7 +197,7 @@ class _AddActivityDialogState<T extends Activity>
                         }),
                         itemBuilder: (context) {
                           return [
-                            for (final activity in presetActivitiesList)
+                            for (final activity in PresetActivitiesList)
                               PopupMenuItem<PlannedActivity>(
                                   value: activity, child: Text(activity.name))
                           ];
@@ -214,7 +211,7 @@ class _AddActivityDialogState<T extends Activity>
               Flexible(
                 flex: 5,
                 child: DropdownButtonFormField<ActivityCategory>(
-                  value: (activityCategory == ActivityCategory.nullCategory
+                  value: (activityCategory == ActivityCategories.Null
                       ? null
                       : activityCategory),
                   icon: const Icon(Icons.arrow_drop_down_circle_outlined),
@@ -227,7 +224,7 @@ class _AddActivityDialogState<T extends Activity>
                     border: OutlineInputBorder(),
                   ),
                   items: [
-                    for (final category in activityCategoriesList)
+                    for (final category in ActivityCategoriesList)
                       DropdownMenuItem<ActivityCategory>(
                           value: category, child: Text(category.name))
                   ],
@@ -503,7 +500,7 @@ class _ActivityListItemActionIconState
 
 class MoodRater extends StatefulWidget {
   // Mood selectedMood = Mood.nullMood;
-  final _notifier = ValueNotifier<Mood>(Mood.nullMood);
+  final _notifier = ValueNotifier<Mood>(Moods.Null);
   final VoidCallback onPressed;
 
   MoodRater({required this.onPressed});
@@ -520,7 +517,7 @@ class _MoodRaterState extends State<MoodRater> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
-        for (var mood in Mood.moods.values)
+        for (final mood in MoodsList)
           DecoratedBox(
             decoration: BoxDecoration(
               shape: BoxShape.circle,
