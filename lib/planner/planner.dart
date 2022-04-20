@@ -1,20 +1,23 @@
-import 'package:firstapp/constants.dart';
-import 'package:firstapp/model/future_activity.dart';
+import 'dart:developer';
+
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 
 import 'package:firstapp/drawer.dart';
-import 'package:firstapp/planner/custom_icon_button.dart';
+import 'package:firstapp/constants.dart';
 
 import 'package:firstapp/model/activity.dart';
-import 'package:firstapp/model/mood.dart';
 import 'package:firstapp/model/activity_category.dart';
+import 'package:firstapp/model/mood.dart';
 import 'package:firstapp/model/planned_activity.dart';
 import 'package:firstapp/model/tracked_activity.dart';
+import 'package:firstapp/model/future_activity.dart';
+import 'package:intl/intl.dart';
 
 import 'planner_model.dart';
 import 'planner_settings.dart';
 import 'expandable_fab.dart';
+import 'custom_icon_button.dart';
 
 class Planner extends StatefulWidget {
   @override
@@ -72,16 +75,19 @@ class PlannerFab extends StatelessWidget {
         ActionButton(
           icon: Icon(Icons.schedule),
           color: Colors.teal,
-          onPressed: () => closeFabNotifier.notify(),
+          onPressed: () => showDialog(
+            context: context,
+            builder: (context) =>
+                AddActivityDialog<FutureActivity>(mediator: mediator),
+          ),
         ),
         ActionButton(
           icon: Icon(Icons.check_circle_outline),
           color: Colors.green,
           onPressed: () => showDialog<void>(
             context: context,
-            builder: (context) {
-              return AddActivityDialog<TrackedActivity>(mediator: mediator);
-            },
+            builder: (context) =>
+                AddActivityDialog<TrackedActivity>(mediator: mediator),
           ),
         ),
         ActionButton(
@@ -89,9 +95,8 @@ class PlannerFab extends StatelessWidget {
           color: Colors.blue,
           onPressed: () => showDialog<void>(
             context: context,
-            builder: (context) {
-              return AddActivityDialog<PlannedActivity>(mediator: mediator);
-            },
+            builder: (context) =>
+                AddActivityDialog<PlannedActivity>(mediator: mediator),
           ),
         )
       ],
@@ -112,15 +117,16 @@ class _AddActivityDialogState<T extends Activity>
     extends State<AddActivityDialog<T>> {
   final _formKey = GlobalKey<FormState>();
   final _textController = TextEditingController();
-  late final MoodRater moodRater;
+  late final MoodRater? moodRater;
+  late final FuturePlanner? futurePlanner;
 
   String activityName = '';
   ActivityCategory activityCategory = ActivityCategories.Null;
   bool isPresetActivity = false;
 
   bool _isActivityValid() => (activityCategory != ActivityCategories.Null &&
-      (_formKey.currentState == null || _formKey.currentState!.validate()) &&
-      (T == TrackedActivity ? moodRater.selectedMood() != Moods.Null : true));
+      (_formKey.currentState?.validate() ?? false) &&
+      (T == TrackedActivity ? moodRater!.selectedMood() != Moods.Null : true));
 
   void _addActivity() {
     var plannedActivity = PlannedActivity(activityName, activityCategory);
@@ -129,7 +135,7 @@ class _AddActivityDialogState<T extends Activity>
     if (T == PlannedActivity)
       activity = plannedActivity;
     else if (T == TrackedActivity)
-      activity = TrackedActivity(plannedActivity, moodRater.selectedMood());
+      activity = TrackedActivity(plannedActivity, moodRater!.selectedMood());
 
     assert(activity != PresetActivities.Null);
 
@@ -140,7 +146,11 @@ class _AddActivityDialogState<T extends Activity>
   @override
   void initState() {
     super.initState();
-    moodRater = MoodRater(onPressed: () => setState(() {}));
+    if (T == TrackedActivity) {
+      moodRater = MoodRater(onPressed: () => setState(() {}));
+    } else if (T == FutureActivity) {
+      futurePlanner = FuturePlanner();
+    }
   }
 
   @override
@@ -148,105 +158,117 @@ class _AddActivityDialogState<T extends Activity>
     return Form(
       key: _formKey,
       child: AlertDialog(
-        content: Container(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Flexible(
-                flex: 5,
-                child: Stack(
-                  children: [
-                    TextFormField(
-                      controller: _textController,
-                      decoration: InputDecoration(
-                        contentPadding: EdgeInsets.fromLTRB(8, 20, 36, 20),
-                        labelText: 'Enter an activity',
-                        filled: true,
-                        fillColor: activityCategory.color.shade100,
-                        border: OutlineInputBorder(),
-                      ),
-                      validator: (String? input) {
-                        if (input == null || input.isEmpty) {
-                          return 'Please name this activity.';
-                        } else if (input.length > 22) {
-                          return 'Please enter a shorter activity.';
-                        }
-
-                        return null;
-                      },
-                      onChanged: (value) {
-                        setState(() {
-                          if (activityName != value) {
-                            isPresetActivity = false;
-                            activityName = value;
+        content: SizedBox(
+          width: double.maxFinite,
+          child: Container(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Flexible(
+                  flex: 5,
+                  child: Stack(
+                    children: [
+                      TextFormField(
+                        controller: _textController,
+                        decoration: InputDecoration(
+                          contentPadding: EdgeInsets.fromLTRB(8, 20, 36, 20),
+                          labelText: 'Enter an activity',
+                          filled: true,
+                          fillColor: activityCategory.color.shade100,
+                          border: OutlineInputBorder(),
+                        ),
+                        validator: (input) {
+                          if (input == null || input.isEmpty) {
+                            return 'Give this activity a name';
+                          } else if (input.length > 24) {
+                            return 'Shorten the activity name';
                           }
-                        });
-                      },
-                      autovalidateMode: AutovalidateMode.always,
-                    ),
-                    Positioned(
-                      right: 0,
-                      top: 5,
-                      child: PopupMenuButton<PlannedActivity>(
-                        icon: Icon(Icons.arrow_drop_down,
-                            color: Colors.black.withOpacity(0.7)),
-                        iconSize: 30,
-                        onSelected: (PlannedActivity activity) => setState(() {
-                          _textController.text = activityName = activity.name;
-                          activityCategory = activity.category;
-                          isPresetActivity = true;
-                        }),
-                        itemBuilder: (context) {
-                          return [
-                            for (final activity in PresetActivitiesList)
-                              PopupMenuItem<PlannedActivity>(
-                                  value: activity, child: Text(activity.name))
-                          ];
+
+                          return null;
                         },
+                        onChanged: (value) {
+                          setState(() {
+                            if (activityName != value) {
+                              isPresetActivity = false;
+                              activityName = value;
+                            }
+                          });
+                        },
+                        autovalidateMode: AutovalidateMode.always,
                       ),
-                    )
-                  ],
-                ),
-              ),
-              Spacer(flex: 1),
-              Flexible(
-                flex: 5,
-                child: DropdownButtonFormField<ActivityCategory>(
-                  value: (activityCategory == ActivityCategories.Null
-                      ? null
-                      : activityCategory),
-                  icon: const Icon(Icons.arrow_drop_down_circle_outlined),
-                  iconEnabledColor: Colors.black.withOpacity(0.6),
-                  iconDisabledColor: Colors.black.withOpacity(0.3),
-                  iconSize: 30,
-                  decoration: InputDecoration(
-                    filled: true,
-                    fillColor: activityCategory.color.shade400,
-                    border: OutlineInputBorder(),
+                      Positioned(
+                        right: 0,
+                        top: 5,
+                        child: PopupMenuButton<PlannedActivity>(
+                          icon: Icon(Icons.arrow_drop_down,
+                              color: Colors.black.withOpacity(0.7)),
+                          iconSize: 30,
+                          onSelected: (PlannedActivity activity) =>
+                              setState(() {
+                            _textController.text = activityName = activity.name;
+                            activityCategory = activity.category;
+                            isPresetActivity = true;
+                          }),
+                          itemBuilder: (context) {
+                            return [
+                              for (final activity in PresetActivitiesList)
+                                PopupMenuItem<PlannedActivity>(
+                                    value: activity, child: Text(activity.name))
+                            ];
+                          },
+                        ),
+                      )
+                    ],
                   ),
-                  items: [
-                    for (final category in ActivityCategoriesList)
-                      DropdownMenuItem<ActivityCategory>(
-                          value: category, child: Text(category.name))
-                  ],
-                  onChanged: isPresetActivity
-                      ? null
-                      : (category) => setState(
-                            () {
-                              activityCategory = category!;
-                            },
-                          ),
                 ),
-              ),
-              if (T == TrackedActivity) ...[
                 Spacer(flex: 1),
-                Flexible(flex: 5, child: moodRater),
-              ] else if (T == FutureActivity) ...[
-                Spacer(flex: 1),
-                // Flexible(flex: 5, child: FuturePlanner()),
-              ]
-            ],
+                Flexible(
+                  flex: 5,
+                  child: DropdownButtonFormField<ActivityCategory>(
+                    value: (activityCategory == ActivityCategories.Null
+                        ? null
+                        : activityCategory),
+                    // icon: const Icon(Icons.arrow_drop_down_circle_outlined),
+                    iconEnabledColor: Colors.black.withOpacity(0.7),
+                    iconDisabledColor: Colors.black.withOpacity(0.3),
+                    iconSize: 30,
+                    decoration: InputDecoration(
+                      filled: true,
+                      fillColor: activityCategory.color.shade400,
+                      border: OutlineInputBorder(),
+                    ),
+                    items: [
+                      for (final category in ActivityCategoriesList)
+                        DropdownMenuItem<ActivityCategory>(
+                            value: category, child: Text(category.name))
+                    ],
+                    validator: (select) {
+                      log(select?.name ?? 'None');
+                      if (select == null) {
+                        return 'Select a category';
+                      }
+
+                      return null;
+                    },
+                    onChanged: isPresetActivity
+                        ? null
+                        : (category) => setState(
+                              () {
+                                activityCategory = category!;
+                              },
+                            ),
+                  ),
+                ),
+                if (T == TrackedActivity) ...[
+                  Spacer(flex: 1),
+                  Flexible(flex: 5, child: moodRater!),
+                ] else if (T == FutureActivity) ...[
+                  Spacer(flex: 1),
+                  Flexible(flex: 5, child: futurePlanner!),
+                ]
+              ],
+            ),
           ),
         ),
         actionsAlignment: MainAxisAlignment.spaceBetween,
@@ -259,7 +281,7 @@ class _AddActivityDialogState<T extends Activity>
           ),
           TextButton(
             onPressed: _isActivityValid() ? _addActivity : null,
-            child: const Text('ADD'),
+            child: Text((T == FutureActivity) ? 'SCHEDULE' : 'ADD'),
           ),
         ],
       ),
@@ -609,14 +631,134 @@ class MoodRaterDialog extends StatelessWidget {
 }
 
 class FuturePlanner extends StatefulWidget {
+  final String _onDate = 'On Date';
+  final String _recurring = 'Recurring';
+
+  final String _daily = 'Daily';
+  final String _weekly = 'Weekly';
+  final String _monthly = 'Monthly';
+  final String _yearly = 'Yearly';
+
   @override
   State<FuturePlanner> createState() => _FuturePlannerState();
 }
 
 class _FuturePlannerState extends State<FuturePlanner> {
+  bool isOnDate = false;
+  bool isRecurring = false;
+  DateTime selectedDate = DateTime.now().add(Duration(hours: 24));
+  DateTime? endDate;
+
+  Widget makeOnDate(BuildContext context) => TextButton(
+        style: TextButton.styleFrom(backgroundColor: Colors.grey.shade100),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Flexible(
+              flex: 7,
+              child: Text(DateFormat(DateFormat.YEAR_ABBR_MONTH_WEEKDAY_DAY)
+                  .format(selectedDate)),
+            ),
+            Spacer(flex: 1),
+            const Icon(Icons.calendar_month),
+          ],
+        ),
+        onPressed: () async {
+          final tomorrow = DateTime.now().add(Duration(hours: 24));
+          final selected = await showDatePicker(
+              context: context,
+              initialDate: tomorrow,
+              firstDate: tomorrow,
+              lastDate: tomorrow.add(Duration(hours: 24 * 365)));
+          if (selected != null)
+            setState(() {
+              selectedDate = selected;
+            });
+        },
+      );
+
+  Widget makeRecurring(BuildContext context) => Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: [
+          SizedBox(
+            width: 88,
+            child: DropdownButtonFormField<String>(
+              onChanged: (value) {
+                assert(value == widget._onDate || value == widget._recurring);
+                setState(() {
+                  isOnDate = value == widget._onDate;
+                  isRecurring = !isOnDate;
+                });
+              },
+              iconSize: 30,
+              iconEnabledColor: Colors.black.withOpacity(0.7),
+              items: [
+                widget._daily,
+                widget._weekly,
+                widget._monthly,
+                widget._yearly
+              ]
+                  .map(
+                      (e) => DropdownMenuItem<String>(value: e, child: Text(e)))
+                  .toList(),
+            ),
+          ),
+          TextButton(
+            style: TextButton.styleFrom(backgroundColor: Colors.grey.shade100),
+            onLongPress: () => setState(() {
+              endDate = null;
+            }),
+            onPressed: () async {
+              final now = DateTime.now();
+              final selected = await showDatePicker(
+                  context: context,
+                  initialDate: now,
+                  firstDate: now,
+                  lastDate: now.add(Duration(hours: 24 * 365)));
+              if (selected != null)
+                setState(() {
+                  endDate = selected;
+                });
+            },
+            child: Text(endDate == null
+                ? 'N/A'
+                : DateFormat(DateFormat.YEAR_ABBR_MONTH_WEEKDAY_DAY)
+                    .format(endDate!)),
+          )
+        ],
+      );
+
   @override
   Widget build(BuildContext context) {
-    // TODO: implement build
-    throw UnimplementedError();
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Flexible(
+          flex: 5,
+          child: DropdownButtonFormField<String>(
+            onChanged: (value) {
+              assert(value == widget._onDate || value == widget._recurring);
+              setState(() {
+                isOnDate = value == widget._onDate;
+                isRecurring = !isOnDate;
+                endDate = null;
+              });
+            },
+            iconSize: 30,
+            iconEnabledColor: Colors.black.withOpacity(0.7),
+            items: [widget._onDate, widget._recurring]
+                .map((e) => DropdownMenuItem<String>(value: e, child: Text(e)))
+                .toList(),
+          ),
+        ),
+        if (isOnDate) ...[
+          Spacer(flex: 1),
+          Flexible(flex: 5, child: makeOnDate(context)),
+        ] else if (isRecurring) ...[
+          Spacer(flex: 1),
+          Flexible(flex: 5, child: makeRecurring(context)),
+        ]
+      ],
+    );
   }
 }
