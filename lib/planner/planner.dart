@@ -1,4 +1,6 @@
 import 'package:firstapp/constants.dart';
+import 'package:firstapp/model/future_activity.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 
 import 'package:firstapp/drawer.dart';
@@ -110,7 +112,7 @@ class _AddActivityDialogState<T extends Activity>
     extends State<AddActivityDialog<T>> {
   final _formKey = GlobalKey<FormState>();
   final _textController = TextEditingController();
-  MoodRater? moodRater;
+  late final MoodRater moodRater;
 
   String activityName = '';
   ActivityCategory activityCategory = ActivityCategories.Null;
@@ -118,7 +120,7 @@ class _AddActivityDialogState<T extends Activity>
 
   bool _isActivityValid() => (activityCategory != ActivityCategories.Null &&
       (_formKey.currentState == null || _formKey.currentState!.validate()) &&
-      (T == TrackedActivity ? moodRater!.selectedMood() != Moods.Null : true));
+      (T == TrackedActivity ? moodRater.selectedMood() != Moods.Null : true));
 
   void _addActivity() {
     var plannedActivity = PlannedActivity(activityName, activityCategory);
@@ -127,7 +129,7 @@ class _AddActivityDialogState<T extends Activity>
     if (T == PlannedActivity)
       activity = plannedActivity;
     else if (T == TrackedActivity)
-      activity = TrackedActivity(plannedActivity, moodRater!.selectedMood());
+      activity = TrackedActivity(plannedActivity, moodRater.selectedMood());
 
     assert(activity != PresetActivities.Null);
 
@@ -136,11 +138,13 @@ class _AddActivityDialogState<T extends Activity>
   }
 
   @override
-  Widget build(BuildContext context) {
-    if (moodRater == null) {
-      moodRater = MoodRater(onPressed: () => setState(() {}));
-    }
+  void initState() {
+    super.initState();
+    moodRater = MoodRater(onPressed: () => setState(() {}));
+  }
 
+  @override
+  Widget build(BuildContext context) {
     return Form(
       key: _formKey,
       child: AlertDialog(
@@ -237,8 +241,11 @@ class _AddActivityDialogState<T extends Activity>
               ),
               if (T == TrackedActivity) ...[
                 Spacer(flex: 1),
-                Flexible(flex: 5, child: moodRater!)
-              ],
+                Flexible(flex: 5, child: moodRater),
+              ] else if (T == FutureActivity) ...[
+                Spacer(flex: 1),
+                // Flexible(flex: 5, child: FuturePlanner()),
+              ]
             ],
           ),
         ),
@@ -297,10 +304,12 @@ class ActivityListView extends StatelessWidget {
                 shadowColor: Colors.transparent),
             child: ReorderableListView.builder(
               /// TODO make restoration stack work
+              /// TODO look into proxyDecorator
               restorationId: 'activitiesList',
               onReorder: (oldIndex, newIndex) => ActivityReorderer(
                   mediator: mediator, oldIndex: oldIndex, newIndex: newIndex),
               itemCount: activities.length,
+              dragStartBehavior: DragStartBehavior.down,
               itemBuilder: (BuildContext context, int index) {
                 final activity = activities[index];
 
@@ -438,8 +447,6 @@ class ActivityListItem extends StatelessWidget {
   }
 }
 
-/// TODO bug where when deleting an activity list item it stays at the same index even if the activity was moved
-/// TODO bug also when deleting an activity, the next one to shift down to the index will also be in delete mode
 class ActivityListItemActionIcon extends StatelessWidget {
   final PlannerMediator mediator;
   final VoidCallback? onPressed;
@@ -598,5 +605,18 @@ class MoodRaterDialog extends StatelessWidget {
         ),
       ],
     );
+  }
+}
+
+class FuturePlanner extends StatefulWidget {
+  @override
+  State<FuturePlanner> createState() => _FuturePlannerState();
+}
+
+class _FuturePlannerState extends State<FuturePlanner> {
+  @override
+  Widget build(BuildContext context) {
+    // TODO: implement build
+    throw UnimplementedError();
   }
 }
