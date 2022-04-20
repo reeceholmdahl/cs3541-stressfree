@@ -631,8 +631,7 @@ class MoodRaterDialog extends StatelessWidget {
 }
 
 class FuturePlanner extends StatefulWidget {
-  final String _onDate = 'On Date';
-  final String _recurring = 'Recurring';
+  final String _onDate = 'Does not repeat';
 
   final String _daily = 'Daily';
   final String _weekly = 'Weekly';
@@ -644,20 +643,20 @@ class FuturePlanner extends StatefulWidget {
 }
 
 class _FuturePlannerState extends State<FuturePlanner> {
-  bool isOnDate = false;
-  bool isRecurring = false;
-  DateTime selectedDate = DateTime.now().add(Duration(hours: 24));
+  String type = '';
+  DateTime onDate = DateTime.now().add(Duration(hours: 24));
+  DateTime startDate = DateTime.now();
   DateTime? endDate;
 
-  Widget makeOnDate(BuildContext context) => TextButton(
+  Widget makeOnDatePicker(BuildContext context) => TextButton(
         style: TextButton.styleFrom(backgroundColor: Colors.grey.shade100),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
             Flexible(
-              flex: 7,
+              flex: 10,
               child: Text(DateFormat(DateFormat.YEAR_ABBR_MONTH_WEEKDAY_DAY)
-                  .format(selectedDate)),
+                  .format(onDate)),
             ),
             Spacer(flex: 1),
             const Icon(Icons.calendar_month),
@@ -672,60 +671,50 @@ class _FuturePlannerState extends State<FuturePlanner> {
               lastDate: tomorrow.add(Duration(hours: 24 * 365)));
           if (selected != null)
             setState(() {
-              selectedDate = selected;
+              onDate = selected;
             });
         },
       );
 
-  Widget makeRecurring(BuildContext context) => Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: [
-          SizedBox(
-            width: 88,
-            child: DropdownButtonFormField<String>(
-              onChanged: (value) {
-                assert(value == widget._onDate || value == widget._recurring);
-                setState(() {
-                  isOnDate = value == widget._onDate;
-                  isRecurring = !isOnDate;
-                });
-              },
-              iconSize: 30,
-              iconEnabledColor: Colors.black.withOpacity(0.7),
-              items: [
-                widget._daily,
-                widget._weekly,
-                widget._monthly,
-                widget._yearly
-              ]
-                  .map(
-                      (e) => DropdownMenuItem<String>(value: e, child: Text(e)))
-                  .toList(),
-            ),
-          ),
-          TextButton(
-            style: TextButton.styleFrom(backgroundColor: Colors.grey.shade100),
-            onLongPress: () => setState(() {
-              endDate = null;
-            }),
-            onPressed: () async {
-              final now = DateTime.now();
-              final selected = await showDatePicker(
-                  context: context,
-                  initialDate: now,
-                  firstDate: now,
-                  lastDate: now.add(Duration(hours: 24 * 365)));
-              if (selected != null)
-                setState(() {
-                  endDate = selected;
-                });
-            },
-            child: Text(endDate == null
-                ? 'N/A'
-                : DateFormat(DateFormat.YEAR_ABBR_MONTH_WEEKDAY_DAY)
-                    .format(endDate!)),
-          )
-        ],
+  Widget makeStartDatePicker(BuildContext context) => TextButton(
+        style: TextButton.styleFrom(backgroundColor: Colors.grey.shade100),
+        onPressed: () async {
+          final now = DateTime.now().add(Duration(hours: 24));
+          final selected = await showDatePicker(
+              context: context,
+              initialDate: now,
+              firstDate: now,
+              lastDate: now.add(Duration(hours: 24 * 365 * 5)));
+          if (selected != null)
+            setState(() {
+              startDate = selected;
+            });
+        },
+        child: Text(DateFormat(DateFormat.YEAR_ABBR_MONTH_WEEKDAY_DAY)
+            .format(startDate)),
+      );
+
+  Widget makeEndDatePicker(BuildContext context) => TextButton(
+        style: TextButton.styleFrom(backgroundColor: Colors.grey.shade100),
+        onLongPress: () => setState(() {
+          endDate = null;
+        }),
+        onPressed: () async {
+          final now = DateTime.now().add(Duration(hours: 24));
+          final selected = await showDatePicker(
+              context: context,
+              initialDate: now,
+              firstDate: now,
+              lastDate: now.add(Duration(hours: 24 * 365 * 5)));
+          if (selected != null)
+            setState(() {
+              endDate = selected;
+            });
+        },
+        child: Text(endDate == null
+            ? 'N/A'
+            : DateFormat(DateFormat.YEAR_ABBR_MONTH_WEEKDAY_DAY)
+                .format(endDate!)),
       );
 
   @override
@@ -736,27 +725,52 @@ class _FuturePlannerState extends State<FuturePlanner> {
         Flexible(
           flex: 5,
           child: DropdownButtonFormField<String>(
+            hint: Text('Choose a recurrence...',
+                style: TextStyle(color: Colors.grey.shade600)),
             onChanged: (value) {
-              assert(value == widget._onDate || value == widget._recurring);
               setState(() {
-                isOnDate = value == widget._onDate;
-                isRecurring = !isOnDate;
+                type = value!;
                 endDate = null;
               });
             },
             iconSize: 30,
             iconEnabledColor: Colors.black.withOpacity(0.7),
-            items: [widget._onDate, widget._recurring]
+            items: [
+              widget._onDate,
+              widget._daily,
+              widget._weekly,
+              widget._monthly,
+              widget._yearly
+            ]
                 .map((e) => DropdownMenuItem<String>(value: e, child: Text(e)))
                 .toList(),
           ),
         ),
-        if (isOnDate) ...[
+        if (type.isNotEmpty) ...[
           Spacer(flex: 1),
-          Flexible(flex: 5, child: makeOnDate(context)),
-        ] else if (isRecurring) ...[
-          Spacer(flex: 1),
-          Flexible(flex: 5, child: makeRecurring(context)),
+          Builder(builder: (BuildContext context) {
+            final columnChildren = <Widget>[];
+            if (type == widget._onDate) {
+              return makeOnDatePicker(context);
+            } else {
+              columnChildren.add(Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  makeStartDatePicker(context),
+                  makeEndDatePicker(context),
+                ],
+              ));
+            }
+
+            if (type == widget._daily) {
+              return Column(
+                children: columnChildren,
+              );
+            } else if (type == widget._weekly) {
+            } else if (type == widget._monthly) {
+            } else if (type == widget._yearly) {}
+            return Container();
+          }),
         ]
       ],
     );
