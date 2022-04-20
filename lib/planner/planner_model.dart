@@ -7,11 +7,26 @@ import 'package:firstapp/model/mood.dart';
 import 'package:firstapp/model/planned_activity.dart';
 import 'package:firstapp/model/tracked_activity.dart';
 
-class PlannerMediator {
-  final List<Activity> activities = [];
-  final notifier = BasicNotifier();
+@immutable
+class PlannerState {
+  const PlannerState({required this.deleteMode});
 
+  final bool deleteMode;
+}
+
+class PlannerMediator {
+  final notifier = BasicNotifier();
+  final List<Activity> _activities = [];
+  PlannerState _state = const PlannerState(deleteMode: false);
   dynamic _sender;
+
+  List<Activity> get activities {
+    return _activities.toList(growable: false);
+  }
+
+  PlannerState get state {
+    return _state;
+  }
 
   void notify(sender) {
     _sender = sender;
@@ -30,25 +45,26 @@ class PlannerMediator {
     } else if (sender is ActivityReorderer) {
       log('notify: _onReorderActivity');
       _onReorderActivity();
+    } else if (sender is PlannerStateChanger) {
+      log('notify: _onStateChange');
+      _onStateChange();
     }
+
+    notifier.notify();
   }
 
   void _onAddActivity() {
     assert(_sender is ActivityAdder);
 
     final sender = _sender as ActivityAdder;
-    activities.insert(0, sender.activity);
-
-    notifier.notify();
+    _activities.insert(0, sender.activity);
   }
 
   void _onRemoveActivity() {
     assert(_sender is ActivityRemover);
 
     final sender = _sender as ActivityRemover;
-    activities.removeAt(sender.index);
-
-    notifier.notify();
+    _activities.removeAt(sender.index);
   }
 
   void _onTrackActivity() {
@@ -56,16 +72,14 @@ class PlannerMediator {
 
     final sender = _sender as MoodTracker;
 
-    assert(activities[sender.index] is PlannedActivity);
+    assert(_activities[sender.index] is PlannedActivity);
 
-    activities.insert(
+    _activities.insert(
         sender.index,
         new TrackedActivity(
-            activities[sender.index] as PlannedActivity, sender.mood));
+            _activities[sender.index] as PlannedActivity, sender.mood));
 
-    activities.removeAt(sender.index + 1);
-
-    notifier.notify();
+    _activities.removeAt(sender.index + 1);
   }
 
   void _onReorderActivity() {
@@ -77,8 +91,16 @@ class PlannerMediator {
     if (sender.oldIndex < newIndex) {
       newIndex -= 1;
     }
-    final Activity activity = activities.removeAt(sender.oldIndex);
-    activities.insert(newIndex, activity);
+    final Activity activity = _activities.removeAt(sender.oldIndex);
+    _activities.insert(newIndex, activity);
+  }
+
+  void _onStateChange() {
+    assert(_sender is PlannerStateChanger);
+
+    final sender = _sender as PlannerStateChanger;
+
+    _state = sender.state;
   }
 }
 
@@ -117,6 +139,15 @@ class ActivityReorderer {
       {required PlannerMediator mediator,
       required this.oldIndex,
       required this.newIndex}) {
+    mediator.notify(this);
+  }
+}
+
+class PlannerStateChanger {
+  final PlannerState state;
+
+  PlannerStateChanger(
+      {required PlannerMediator mediator, required this.state}) {
     mediator.notify(this);
   }
 }

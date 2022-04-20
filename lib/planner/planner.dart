@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:firstapp/constants.dart';
 import 'package:flutter/material.dart';
 
@@ -390,6 +388,10 @@ class ActivityListItem extends StatelessWidget {
             color: activity.category.color.shade300,
             child: InkWell(
               onDoubleTap: () {},
+              onTap: () {
+                PlannerStateChanger(
+                    mediator: mediator, state: PlannerState(deleteMode: false));
+              },
               borderRadius: const BorderRadius.all(Radius.circular(8)),
               splashColor: activity.category.color.shade200,
               child: Row(
@@ -438,7 +440,7 @@ class ActivityListItem extends StatelessWidget {
 
 /// TODO bug where when deleting an activity list item it stays at the same index even if the activity was moved
 /// TODO bug also when deleting an activity, the next one to shift down to the index will also be in delete mode
-class ActivityListItemActionIcon extends StatefulWidget {
+class ActivityListItemActionIcon extends StatelessWidget {
   final PlannerMediator mediator;
   final VoidCallback? onPressed;
   final Activity activity;
@@ -452,48 +454,39 @@ class ActivityListItemActionIcon extends StatefulWidget {
       required this.activity,
       required this.index});
 
-  @override
-  State<ActivityListItemActionIcon> createState() =>
-      _ActivityListItemActionIconState();
-}
-
-class _ActivityListItemActionIconState
-    extends State<ActivityListItemActionIcon> {
-  bool deleteMode = false;
-
   void _onLongPress() {
-    log('Delete mode!');
-    setState(() {
-      deleteMode = true;
-    });
+    PlannerStateChanger(
+        mediator: mediator, state: PlannerState(deleteMode: true));
   }
 
   void _onDelete() {
-    ActivityRemover(mediator: widget.mediator, index: widget.index);
+    ActivityRemover(mediator: mediator, index: index);
+    PlannerStateChanger(
+        mediator: mediator, state: PlannerState(deleteMode: false));
   }
 
   @override
   Widget build(BuildContext context) {
-    var icon = deleteMode
-        ? widget.deleteIcon
+    final icon = mediator.state.deleteMode
+        ? deleteIcon
         : Material(
             elevation: 2,
             shape: CircleBorder(),
-            color: (widget.activity is TrackedActivity)
-                ? (widget.activity as TrackedActivity).mood.color.shade300
-                : widget.activity.category.color.shade300,
-            child: (widget.activity is TrackedActivity)
-                ? Icon((widget.activity as TrackedActivity).mood.iconData,
+            color: (activity is TrackedActivity)
+                ? (activity as TrackedActivity).mood.color.shade300
+                : activity.category.color.shade300,
+            child: (activity is TrackedActivity)
+                ? Icon((activity as TrackedActivity).mood.iconData,
                     color: Colors.black.withOpacity(0.7))
                 : Icon(Icons.radio_button_unchecked,
                     color: Colors.black.withOpacity(0.7)),
           );
 
     return CustomIconButton(
-      onPressed: deleteMode ? _onDelete : widget.onPressed,
+      onPressed: mediator.state.deleteMode ? _onDelete : onPressed,
       onLongPress: _onLongPress,
       icon: icon,
-      splashColor: widget.activity.category.color.shade200,
+      splashColor: activity.category.color.shade200,
     );
   }
 }
