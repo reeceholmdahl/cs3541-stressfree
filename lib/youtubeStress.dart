@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 
+import 'drawer.dart';
 import 'video_list.dart';
 
 void main() {
@@ -160,6 +161,7 @@ class _MyHomePageState extends State<MyHomePage> {
         },
       ),
       builder: (context, player) => Scaffold(
+        drawer: sideDrawerLeft(),
         appBar: AppBar(
           leading: Padding(
             padding: const EdgeInsets.only(left: 12.0),
