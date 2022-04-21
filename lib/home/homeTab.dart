@@ -102,7 +102,7 @@ class PressableCard extends StatefulWidget {
 
   final VoidCallback? onPressed;
   final Color color;
-  //final String image;
+  //final var image;
   final Animation<double> flattenAnimation;
   final Widget? child;
 
@@ -201,7 +201,7 @@ class tile extends StatelessWidget {
 
   final String name;
   final Color color;
-  //final String image;
+  //final var image;
   final VoidCallback? onPressed;
   final Animation<double> transitionAnimation; //not going to use, but can do later
 

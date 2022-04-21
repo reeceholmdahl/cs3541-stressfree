@@ -1,12 +1,12 @@
 import 'package:firstapp/drawer.dart';
+import 'package:firstapp/journal/pastJournal.dart';
+import 'package:firstapp/journal/readableData/readable.dart';
+import 'package:firstapp/journal/readableData/readableList.dart';
 import 'package:flutter/material.dart';
 
-import 'readMore.dart';
-import 'techniquesData/techniques.dart';
-import 'techniquesData/techniquesList.dart';
 
-class stressManagement extends StatelessWidget {
-  const stressManagement({Key? key}) : super(key: key);
+class historyView extends StatelessWidget {
+  const historyView({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -16,9 +16,14 @@ class stressManagement extends StatelessWidget {
       home: Scaffold(
         appBar: AppBar(
           title: const Text(appTitle),
+          automaticallyImplyLeading: false,
+          leading: new IconButton(
+            icon: new Icon(Icons.arrow_back, color: Colors.white),
+            onPressed: () => Navigator.of(context).pop(),
+          ),
         ),
         resizeToAvoidBottomInset: false,
-        drawer: sideDrawerLeft(),
+
         body: ListPage(),
       ),
     );
@@ -34,17 +39,17 @@ class ListPage extends StatefulWidget {
 }
 
 class _ListPageState extends State<ListPage> {
-  late List techniques;
+  late List readable;
 
   @override
   void initState() {
-    techniques = getTechniques();
+    readable = getReadable();
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-    ListTile makeListTile(Technique technique) => ListTile(
+    ListTile makeListTile(Readable readable) => ListTile(
       contentPadding:
       EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
       leading: Container(
@@ -52,10 +57,10 @@ class _ListPageState extends State<ListPage> {
         decoration: new BoxDecoration(
             border: new Border(
                 right: new BorderSide(width: 1.0, color: Colors.white24))),
-        child: Icon(Icons.article_rounded, color: Colors.white),
+        child: Icon(readable.icon, color: Colors.white),
       ),
       title: Text(
-        technique.title,
+        readable.title,
         style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
       ),
       trailing:
@@ -64,16 +69,20 @@ class _ListPageState extends State<ListPage> {
         Navigator.push(
             context,
             MaterialPageRoute(
-                builder: (context) => readMore(technique: technique)));
+                builder: (context) => pastJournal(readable: readable)));
       },
     );
 
-    Card makeCard(Technique technique) => Card(
+    Card makeCard(Readable readable) => Card(
       elevation: 8.0,
       margin: new EdgeInsets.symmetric(horizontal: 10.0, vertical: 6.0),
       child: Container(
-        decoration: BoxDecoration(color: Color.fromRGBO(0, 0, 255, .9)),
-        child: makeListTile(technique),
+        decoration: BoxDecoration(
+            color: readable.color,
+            borderRadius: BorderRadius.circular(6),
+            //backgroundBlendMode: Colors.fromRGBO(0, 0, 0, 0),
+        ),
+        child: makeListTile(readable),
       ),
     );
 
@@ -81,9 +90,9 @@ class _ListPageState extends State<ListPage> {
       child: ListView.builder(
         scrollDirection: Axis.vertical,
         shrinkWrap: true,
-        itemCount: techniques.length,
+        itemCount: readable.length,
         itemBuilder: (BuildContext context, int index) {
-          return makeCard(techniques[index]);
+          return makeCard(readable[index]);
         },
       ),
     );

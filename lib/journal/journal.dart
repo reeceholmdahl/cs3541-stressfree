@@ -1,5 +1,11 @@
 import 'package:firstapp/drawer.dart';
+import 'package:firstapp/journal/pastJournal.dart';
+import 'package:firstapp/journal/readableData/readableList.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:firstapp/data/mood.dart';
+
+import 'historyView.dart';
 
 class journal extends StatelessWidget {
   const journal({Key? key}) : super(key: key);
@@ -10,33 +16,24 @@ class journal extends StatelessWidget {
     return MaterialApp(
       title: appTitle,
       home: Scaffold(
-        persistentFooterButtons: [
-          IconButton(
-            icon: const Icon(Icons.play_arrow),
-            onPressed: null,
-          ),
-          IconButton(
-            icon: const Icon(Icons.pause),
-            onPressed: null,
-          ),
-          IconButton(
-            icon: const Icon(Icons.skip_next),
-            onPressed: null,
-          ),
-        ],
         appBar: AppBar(
           title: const Text(appTitle),
         ),
         resizeToAvoidBottomInset: false,
         drawer: sideDrawerLeft(),
-        body: const journalArea(),
+        body: journalArea(),
       ),
     );
   }
 }
 
 class journalArea extends StatelessWidget {
-  const journalArea({Key? key}) : super(key: key);
+  var _mood = Mood.nullMood;
+  final titleController = TextEditingController();
+  final controller = TextEditingController();
+  var moodColor = Colors.white;
+  var moodIcon = Icons.visibility_off_sharp;
+  journalArea({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -67,8 +64,11 @@ class journalArea extends StatelessWidget {
                         width: 3,
                         color: Colors.red
                     ),
-                    child: Icon(Icons.assignment_ind_outlined),
-                    onPressed: () { },
+                    child: Icon(Mood.icon_bad),
+                    onPressed: () {
+                      moodColor = Colors.red;
+                      moodIcon = Mood.icon_bad;
+                    },
                   ),
                   OutlineButton(
                     shape: CircleBorder(),
@@ -78,8 +78,11 @@ class journalArea extends StatelessWidget {
                         width: 3,
                         color: Colors.amber
                     ),
-                    onPressed: () { },
-                    child: Text('2'),
+                    child: Icon(Mood.icon_medium),
+                    onPressed: () {
+                      moodColor = Colors.amber;
+                      moodIcon = Mood.icon_medium;
+                    }
                   ),
                   OutlineButton(
                     shape: CircleBorder(),
@@ -89,8 +92,11 @@ class journalArea extends StatelessWidget {
                         width: 3,
                         color: Colors.lime
                     ),
-                    onPressed: () { },
-                    child: Text('3'),
+                    child: Icon(Mood.icon_good),
+                    onPressed: () {
+                      moodColor = Colors.lime;
+                      moodIcon = Mood.icon_good;
+                    },
                   ),
                   OutlineButton(
                     shape: CircleBorder(),
@@ -100,8 +106,11 @@ class journalArea extends StatelessWidget {
                         width: 3,
                         color: Colors.green
                     ),
-                    onPressed: () { },
-                    child: Text('4'),
+                    child: Icon(Mood.icon_great),
+                    onPressed: () {
+                      moodColor = Colors.green;
+                      moodIcon = Mood.icon_great;
+                    },
                   ),
                 ],
               ),
@@ -112,7 +121,21 @@ class journalArea extends StatelessWidget {
             child: Padding(
               padding: EdgeInsets.all(8.0),
               child: TextField(
-                maxLines: 20,
+                controller: titleController,
+                maxLines: 1,
+                decoration: InputDecoration.collapsed(
+                  hintText: "Title",
+                ),
+              ),
+            )
+        ),
+        Card(
+            color: Colors.grey,
+            child: Padding(
+              padding: EdgeInsets.all(8.0),
+              child: TextField(
+                controller: controller,
+                maxLines: 17,
                 decoration: InputDecoration.collapsed(
                     hintText: "Write about your day here!",
                 ),
@@ -120,9 +143,9 @@ class journalArea extends StatelessWidget {
             )
         ),
         Padding(
-          padding: EdgeInsets.symmetric(horizontal: 8, vertical: 16),
+          padding: EdgeInsets.symmetric(horizontal: 14, vertical: 16),
           child: Center(
-            child: Column(
+            child: Row(
               children: <Widget>[
                 ElevatedButton(
                   style: ElevatedButton.styleFrom(
@@ -137,7 +160,31 @@ class journalArea extends StatelessWidget {
                     ),
                   ),
                   onPressed: () {
-                    //implement later
+
+                    inputReadable(moodIcon, moodColor, controller.text, titleController.text);
+                    
+                    //For origional  pastJournals(controllerText: controller, color: moodColor, icon: moodIcon);
+                  },
+                ),
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    primary: Colors.blue,
+                    fixedSize: const Size(180, 60),
+                  ),
+                  child: Text(
+                    'View Submissions',
+                    style: const TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  onPressed: () {
+                    Navigator.push<void>(context,
+                        MaterialPageRoute(builder: (context) =>  historyView()));
+
+                    // For Origional
+                    //Navigator.push<void>(context,
+                    //    MaterialPageRoute(builder: (context) =>  pastJournals(controllerText: controller, color: moodColor, icon: moodIcon)));
                   },
                 ),
               ]

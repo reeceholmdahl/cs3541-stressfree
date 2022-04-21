@@ -1,21 +1,24 @@
 
+import 'package:firstapp/journal/readableData/readable.dart';
 import 'package:firstapp/stressManagement/techniquesData/techniques.dart';
 import 'package:flutter/material.dart';
-import 'techniquesData/techniques.dart';
+import 'journal.dart';
+import 'package:firstapp/data/mood.dart';
+//
+//FOR TESTING OTHER SHIT
+//
 
-
-class readMore extends StatelessWidget {
-  final Technique technique;
-  readMore({Key? key, required this.technique}) : super(key: key);
+class pastJournal extends StatelessWidget {
+  final Readable readable;
+  pastJournal({Key? key, required this.readable}) : super(key: key);
   @override
   Widget build(BuildContext context) {
-
     final topContentText = Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
         SizedBox(height: 120.0),
         Icon(
-          Icons.wysiwyg,
+          readable.icon,
           color: Colors.white,
           size: 40.0,
         ),
@@ -25,7 +28,7 @@ class readMore extends StatelessWidget {
         ),
         SizedBox(height: 10.0),
         Text(
-          technique.title,
+          readable.title,
           style: TextStyle(color: Colors.white, fontSize: 45.0),
         ),
         SizedBox(height: 30.0),
@@ -39,7 +42,7 @@ class readMore extends StatelessWidget {
       children: <Widget>[
         Container(
           padding: EdgeInsets.all(40.0),
-          decoration: BoxDecoration(color: Color.fromRGBO(0, 0, 255, .9)),
+          decoration: BoxDecoration(color: readable.color),
           child: Center(
             child: topContentText,
           ),
@@ -58,7 +61,7 @@ class readMore extends StatelessWidget {
     );
 
     final bottomContentText = Text(
-      technique.content,
+      readable.content,
       style: TextStyle(fontSize: 18.0),
     );
     final bottomContent = Container(
