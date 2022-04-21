@@ -82,20 +82,6 @@ class TestState extends State<Test> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      persistentFooterButtons: [
-        IconButton(
-          icon: const Icon(Icons.play_arrow),
-          onPressed: null,
-        ),
-        IconButton(
-          icon: const Icon(Icons.pause),
-          onPressed: null,
-        ),
-        IconButton(
-          icon: const Icon(Icons.skip_next),
-          onPressed: null,
-        ),
-      ],
       drawer: sideDrawerLeft(),
       appBar: AppBar(
         title: const Text('Alarm Page'),
