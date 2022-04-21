@@ -10,20 +10,6 @@ class FavoriteTips extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        persistentFooterButtons: [
-          IconButton(
-            icon: const Icon(Icons.play_arrow),
-            onPressed: null,
-          ),
-          IconButton(
-            icon: const Icon(Icons.pause),
-            onPressed: null,
-          ),
-          IconButton(
-            icon: const Icon(Icons.skip_next),
-            onPressed: null,
-          ),
-        ],
       appBar: AppBar(title: const Text('Favorites')),
       drawer: sideDrawerLeft(),
       body: Favorites(),
@@ -49,31 +35,71 @@ class Favorites extends StatefulWidget {
 
 class _FavoritesState extends State<Favorites> {
 
+  List<Idea> allIdeas = TipLists.ideas;
+  List<Idea> favorites = TipLists.favIdeas;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: ReorderableListView.builder(
+        buildDefaultDragHandles: false,
+        itemCount: favorites.length,
         onReorder: (int oldIdx, int newIdx) {
           setState(() {
-            if (oldIdx < newIdx) {
+            if (oldIdx < newIdx)
               newIdx -= 1;
-            }
-            final Idea item = TipLists.favIdeas.removeAt(oldIdx);
-            TipLists.favIdeas.insert(newIdx, item);
+            final Idea item = favorites.removeAt(oldIdx);
+            favorites.insert(newIdx, item);
           });
         },
-        itemCount: TipLists.favIdeas.length,
-        itemBuilder: (context,index){
-          return Card(
+
+        itemBuilder: (context,index) {
+
+          Idea idea = favorites[index];
+
+          return Dismissible(
+            key: Key(idea.what),
+            onDismissed: (direction) {
+              setState(() {
+                int regListIdx = allIdeas.indexOf(idea);
+                allIdeas[regListIdx].switchFavorited();
+                favorites.removeAt(index);
+              });
+              ScaffoldMessenger.of(context)
+                .showSnackBar(SnackBar(
+                  content: Text("Removed from favorites")
+              ));
+            },
+
+            background: Container(color: Colors.red,
+              alignment: Alignment.centerRight,
+              padding: EdgeInsets.fromLTRB(20, 10, 20, 10),
+              child: Text("Remove",
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 18,
+                )
+              ),
+            ),
+
             child: ListTile(
               onTap: (){},
-              title: Text(TipLists.favIdeas[index].what),
+              title: Text(idea.what),
+              leading: CircleAvatar(
+                child: Icon(idea.icon, color: idea.iconColor,
+                ),
+                backgroundColor: idea.backgroundColor,
+              ),
+              trailing: ReorderableDragStartListener(
+                index: index,
+                child: Icon(Icons.view_headline, color: Colors.blueGrey,),
+              )
             ),
-            key: Key('$index'),
-          );
-        }
-      )
 
+          );
+        },
+
+      )
     );
   }
 }
