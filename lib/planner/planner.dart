@@ -124,9 +124,13 @@ class _AddActivityDialogState<T extends Activity>
   ActivityCategory activityCategory = ActivityCategories.Null;
   bool isPresetActivity = false;
 
-  bool _isActivityValid() => (activityCategory != ActivityCategories.Null &&
-      (_formKey.currentState?.validate() ?? false) &&
-      (T == TrackedActivity ? moodRater!.selectedMood() != Moods.Null : true));
+  bool _isActivityValid() =>
+      (activityCategory != ActivityCategories.Null &&
+          (_formKey.currentState?.validate() ?? false) &&
+          (T == TrackedActivity
+              ? moodRater!.selectedMood() != Moods.Null
+              : true)) &&
+      (T == FutureActivity ? futurePlanner!.recurrence != null : true);
 
   void _addActivity() {
     var plannedActivity = PlannedActivity(activityName, activityCategory);
@@ -147,9 +151,9 @@ class _AddActivityDialogState<T extends Activity>
   void initState() {
     super.initState();
     if (T == TrackedActivity) {
-      moodRater = MoodRater(onPressed: () => setState(() {}));
+      moodRater = MoodRater(onChanged: () => setState(() {}));
     } else if (T == FutureActivity) {
-      futurePlanner = FuturePlanner();
+      futurePlanner = FuturePlanner(onChanged: () => setState(() {}));
     }
   }
 
@@ -158,118 +162,120 @@ class _AddActivityDialogState<T extends Activity>
     return Form(
       key: _formKey,
       child: AlertDialog(
-        content: SizedBox(
-          width: double.maxFinite,
-          child: Container(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Flexible(
-                  flex: 5,
-                  child: Stack(
-                    children: [
-                      TextFormField(
-                        controller: _textController,
-                        decoration: InputDecoration(
-                          contentPadding: EdgeInsets.fromLTRB(8, 20, 36, 20),
-                          labelText: 'Enter an activity',
-                          filled: true,
-                          fillColor: activityCategory.color.shade100,
-                          border: OutlineInputBorder(),
-                        ),
-                        validator: (input) {
-                          if (input == null || input.isEmpty) {
-                            return 'Give this activity a name';
-                          } else if (input.length > 24) {
-                            return 'Shorten the activity name';
-                          }
-
-                          return null;
-                        },
-                        onChanged: (value) {
-                          setState(() {
-                            if (activityName != value) {
-                              isPresetActivity = false;
-                              activityName = value;
-                            }
-                          });
-                        },
-                        autovalidateMode: AutovalidateMode.always,
-                      ),
-                      Positioned(
-                        right: 0,
-                        top: 5,
-                        child: PopupMenuButton<PlannedActivity>(
-                          icon: Icon(Icons.arrow_drop_down,
-                              color: Colors.black.withOpacity(0.7)),
-                          iconSize: 30,
-                          onSelected: (PlannedActivity activity) =>
-                              setState(() {
-                            _textController.text = activityName = activity.name;
-                            activityCategory = activity.category;
-                            isPresetActivity = true;
-                          }),
-                          itemBuilder: (context) {
-                            return [
-                              for (final activity in PresetActivitiesList)
-                                PopupMenuItem<PlannedActivity>(
-                                    value: activity, child: Text(activity.name))
-                            ];
-                          },
-                        ),
-                      )
-                    ],
-                  ),
-                ),
-                Spacer(flex: 1),
-                Flexible(
-                  flex: 5,
-                  child: DropdownButtonFormField<ActivityCategory>(
-                    value: (activityCategory == ActivityCategories.Null
-                        ? null
-                        : activityCategory),
-                    // icon: const Icon(Icons.arrow_drop_down_circle_outlined),
-                    iconEnabledColor: Colors.black.withOpacity(0.7),
-                    iconDisabledColor: Colors.black.withOpacity(0.3),
-                    iconSize: 30,
+        content: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Flexible(
+              flex: 5,
+              child: Stack(
+                children: [
+                  TextFormField(
+                    controller: _textController,
+                    style: TextStyle(
+                        color: isPresetActivity
+                            ? Colors.black.withOpacity(0.7)
+                            : null,
+                        fontWeight: isPresetActivity ? FontWeight.bold : null),
                     decoration: InputDecoration(
+                      contentPadding: EdgeInsets.fromLTRB(8, 20, 36, 20),
+                      labelText: 'Enter an activity',
                       filled: true,
-                      fillColor: activityCategory.color.shade400,
+                      fillColor: activityCategory.color.shade100,
                       border: OutlineInputBorder(),
                     ),
-                    items: [
-                      for (final category in ActivityCategoriesList)
-                        DropdownMenuItem<ActivityCategory>(
-                            value: category, child: Text(category.name))
-                    ],
-                    validator: (select) {
-                      log(select?.name ?? 'None');
-                      if (select == null) {
-                        return 'Select a category';
+                    validator: (input) {
+                      if (input == null || input.isEmpty) {
+                        return 'Give this activity a name';
+                      } else if (input.length > 24) {
+                        return 'Shorten the activity name';
                       }
 
                       return null;
                     },
-                    onChanged: isPresetActivity
-                        ? null
-                        : (category) => setState(
-                              () {
-                                activityCategory = category!;
-                              },
-                            ),
+                    onChanged: (value) {
+                      setState(() {
+                        if (activityName != value) {
+                          isPresetActivity = false;
+                          activityName = value;
+                        }
+                      });
+                    },
+                    autovalidateMode: AutovalidateMode.always,
                   ),
-                ),
-                if (T == TrackedActivity) ...[
-                  Spacer(flex: 1),
-                  Flexible(flex: 5, child: moodRater!),
-                ] else if (T == FutureActivity) ...[
-                  Spacer(flex: 1),
-                  Flexible(flex: 5, child: futurePlanner!),
-                ]
-              ],
+                  Positioned(
+                    right: 0,
+                    top: 5,
+                    child: PopupMenuButton<PlannedActivity>(
+                      icon: Icon(Icons.arrow_drop_down,
+                          color: Colors.black.withOpacity(0.7)),
+                      iconSize: 30,
+                      onSelected: (PlannedActivity activity) => setState(() {
+                        _textController.text = activityName = activity.name;
+                        activityCategory = activity.category;
+                        isPresetActivity = true;
+                      }),
+                      itemBuilder: (context) {
+                        return [
+                          for (final activity in PresetActivitiesList)
+                            PopupMenuItem<PlannedActivity>(
+                                value: activity, child: Text(activity.name))
+                        ];
+                      },
+                    ),
+                  )
+                ],
+              ),
             ),
-          ),
+            Spacer(flex: 1),
+            Flexible(
+              flex: 5,
+              child: DropdownButtonFormField<ActivityCategory>(
+                style: Theme.of(context).textTheme.subtitle1?.copyWith(
+                    fontWeight: isPresetActivity ? FontWeight.bold : null),
+                value: (activityCategory == ActivityCategories.Null
+                    ? null
+                    : activityCategory),
+                // icon: const Icon(Icons.arrow_drop_down_circle_outlined),
+                iconEnabledColor: Colors.black.withOpacity(0.7),
+                iconDisabledColor: Colors.black.withOpacity(0.3),
+                iconSize: 30,
+                decoration: InputDecoration(
+                  filled: true,
+                  fillColor: activityCategory.color.shade400,
+                  border: OutlineInputBorder(),
+                ),
+                items: [
+                  for (final category in ActivityCategoriesList)
+                    DropdownMenuItem<ActivityCategory>(
+                        value: category, child: Text(category.name))
+                ],
+                validator: (select) {
+                  // log(select?.name ?? 'None');
+                  if (select == null &&
+                      activityCategory == ActivityCategories.Null) {
+                    return 'Select a category';
+                  }
+
+                  return null;
+                },
+                onChanged: isPresetActivity
+                    ? null
+                    : (category) => setState(
+                          () {
+                            activityCategory = category!;
+                          },
+                        ),
+              ),
+            ),
+            if (T == TrackedActivity) ...[
+              Spacer(flex: 1),
+              Flexible(flex: 5, child: moodRater!),
+            ] else if (T == FutureActivity) ...[
+              Spacer(flex: 1),
+              Flexible(flex: 12, child: futurePlanner!),
+            ]
+          ],
         ),
         actionsAlignment: MainAxisAlignment.spaceBetween,
         actions: [
@@ -523,9 +529,9 @@ class ActivityListItemActionIcon extends StatelessWidget {
 class MoodRater extends StatefulWidget {
   // Mood selectedMood = Mood.nullMood;
   final _notifier = ValueNotifier<Mood>(Moods.Null);
-  final VoidCallback onPressed;
+  final VoidCallback onChanged;
 
-  MoodRater({required this.onPressed});
+  MoodRater({required this.onChanged});
 
   Mood selectedMood() => _notifier.value;
 
@@ -555,7 +561,7 @@ class _MoodRaterState extends State<MoodRater> {
                 splashColor: mood.color.shade200,
                 customBorder: CircleBorder(),
                 onTap: () {
-                  widget.onPressed();
+                  widget.onChanged();
                   setState(() {
                     widget._notifier.value = mood;
                   });
@@ -587,7 +593,7 @@ class MoodRaterDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final moodRater = MoodRater(onPressed: () {});
+    final moodRater = MoodRater(onChanged: () {});
 
     final theme = Theme.of(context);
     return AlertDialog(
@@ -631,12 +637,18 @@ class MoodRaterDialog extends StatelessWidget {
 }
 
 class FuturePlanner extends StatefulWidget {
+  VoidCallback onChanged;
+
+  FuturePlanner({required this.onChanged});
+
   final String _onDate = 'Does not repeat';
 
   final String _daily = 'Daily';
   final String _weekly = 'Weekly';
   final String _monthly = 'Monthly';
   final String _yearly = 'Yearly';
+
+  Recurrence? recurrence;
 
   @override
   State<FuturePlanner> createState() => _FuturePlannerState();
@@ -647,6 +659,9 @@ class _FuturePlannerState extends State<FuturePlanner> {
   DateTime onDate = DateTime.now().add(Duration(hours: 24));
   DateTime startDate = DateTime.now();
   DateTime? endDate;
+
+  final List<bool> weekdays = List.generate(7, (i) => false, growable: false);
+  final List<String> weekdayNames = const ['M', 'T', 'W', 'Th', 'F', 'Sa', 'S'];
 
   Widget makeOnDatePicker(BuildContext context) => TextButton(
         style: TextButton.styleFrom(backgroundColor: Colors.grey.shade100),
@@ -672,6 +687,8 @@ class _FuturePlannerState extends State<FuturePlanner> {
           if (selected != null)
             setState(() {
               onDate = selected;
+              makeRecurrence();
+              widget.onChanged();
             });
         },
       );
@@ -688,6 +705,8 @@ class _FuturePlannerState extends State<FuturePlanner> {
           if (selected != null)
             setState(() {
               startDate = selected;
+              makeRecurrence();
+              widget.onChanged();
             });
         },
         child: Text(DateFormat(DateFormat.YEAR_ABBR_MONTH_WEEKDAY_DAY)
@@ -709,6 +728,8 @@ class _FuturePlannerState extends State<FuturePlanner> {
           if (selected != null)
             setState(() {
               endDate = selected;
+              makeRecurrence();
+              widget.onChanged();
             });
         },
         child: Text(endDate == null
@@ -716,6 +737,41 @@ class _FuturePlannerState extends State<FuturePlanner> {
             : DateFormat(DateFormat.YEAR_ABBR_MONTH_WEEKDAY_DAY)
                 .format(endDate!)),
       );
+
+  void makeRecurrence() {
+    if (type == widget._onDate) {
+      widget.recurrence = Recurrence.once(date: onDate);
+    } else if (type == widget._daily) {
+      widget.recurrence =
+          Recurrence.daily(startDate: startDate, endDate: endDate);
+    } else if (type == widget._weekly) {
+      if (!weekdays.reduce((value, element) => value || element)) {
+        log('No weekdays selected');
+        widget.recurrence = null;
+      } else {
+        widget.recurrence = Recurrence.weekly(
+            startDate: startDate,
+            endDate: endDate,
+            monday: weekdays[0],
+            tuesday: weekdays[1],
+            wednesday: weekdays[2],
+            thursday: weekdays[3],
+            friday: weekdays[4],
+            saturday: weekdays[5],
+            sunday: weekdays[6]);
+      }
+    } else if (type == widget._monthly) {
+      widget.recurrence =
+          Recurrence.monthly(startDate: startDate, endDate: endDate);
+    } else if (type == widget._yearly) {
+      widget.recurrence =
+          Recurrence.yearly(startDate: startDate, endDate: endDate);
+    } else {
+      widget.recurrence = null;
+    }
+
+    log(widget.recurrence.toString());
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -731,6 +787,8 @@ class _FuturePlannerState extends State<FuturePlanner> {
               setState(() {
                 type = value!;
                 endDate = null;
+                makeRecurrence();
+                widget.onChanged();
               });
             },
             iconSize: 30,
@@ -748,29 +806,99 @@ class _FuturePlannerState extends State<FuturePlanner> {
         ),
         if (type.isNotEmpty) ...[
           Spacer(flex: 1),
-          Builder(builder: (BuildContext context) {
-            final columnChildren = <Widget>[];
-            if (type == widget._onDate) {
-              return makeOnDatePicker(context);
-            } else {
-              columnChildren.add(Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  makeStartDatePicker(context),
-                  makeEndDatePicker(context),
-                ],
-              ));
-            }
+          Flexible(
+            flex: type == widget._weekly ? 5 : 3,
+            child: Builder(builder: (BuildContext context) {
+              final columnChildren = <Widget>[];
+              if (type == widget._onDate) {
+                return makeOnDatePicker(context);
+              } else {
+                columnChildren.add(Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    Column(
+                      children: [
+                        Center(
+                            child: Text('Starts on',
+                                style: TextStyle(color: Colors.grey.shade700))),
+                        makeStartDatePicker(context),
+                      ],
+                    ),
+                    Column(
+                      children: [
+                        Center(
+                            child: Text('Ends on',
+                                style: TextStyle(color: Colors.grey.shade700))),
+                        makeEndDatePicker(context),
+                      ],
+                    ),
+                  ],
+                ));
+              }
 
-            if (type == widget._daily) {
-              return Column(
-                children: columnChildren,
-              );
-            } else if (type == widget._weekly) {
-            } else if (type == widget._monthly) {
-            } else if (type == widget._yearly) {}
-            return Container();
-          }),
+              if (type == widget._daily ||
+                  type == widget._monthly ||
+                  type == widget._yearly) {
+                return Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: columnChildren,
+                );
+              } else if (type == widget._weekly) {
+                return Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    ...columnChildren,
+                    Padding(
+                        padding: EdgeInsets.only(top: 5, bottom: 5),
+                        child: Text(
+                          'Days',
+                          style: TextStyle(color: Colors.grey.shade700),
+                          textAlign: TextAlign.center,
+                        )),
+                    StatefulBuilder(
+                      builder: (BuildContext context, StateSetter setState) {
+                        return Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: [
+                            for (int i = 0; i < 7; ++i)
+                              DecoratedBox(
+                                decoration: BoxDecoration(
+                                    color: weekdays[i]
+                                        ? Colors.grey.shade300
+                                        : Colors.grey.shade50,
+                                    shape: BoxShape.circle,
+                                    border: Border.all(
+                                        color: Colors.grey.shade300, width: 2)),
+                                child: Material(
+                                  shape: CircleBorder(),
+                                  color: Colors.transparent,
+                                  child: SizedBox(
+                                    width: 30,
+                                    height: 30,
+                                    child: InkWell(
+                                        customBorder: CircleBorder(),
+                                        onTap: () => setState(() {
+                                              weekdays[i] = !weekdays[i];
+                                              makeRecurrence();
+                                              widget.onChanged();
+                                            }),
+                                        child: Center(
+                                            child: Text(weekdayNames[i]))),
+                                  ),
+                                ),
+                              )
+                          ],
+                        );
+                      },
+                    )
+                  ],
+                );
+              }
+
+              // ! should not be possible to get here
+              throw UnimplementedError();
+            }),
+          ),
         ]
       ],
     );
