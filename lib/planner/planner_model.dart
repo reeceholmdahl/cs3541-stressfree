@@ -1,5 +1,6 @@
 import 'dart:developer';
 
+import 'package:firstapp/model/future_activity.dart';
 import 'package:flutter/foundation.dart';
 
 import 'package:firstapp/model/activity.dart';
@@ -14,7 +15,7 @@ class PlannerState {
   final bool deleteMode;
 }
 
-class PlannerMediator {
+class _PlannerMediator {
   final notifier = BasicNotifier();
   final List<Activity> _activities = [];
   PlannerState _state = const PlannerState(deleteMode: false);
@@ -64,7 +65,13 @@ class PlannerMediator {
     assert(_sender is ActivityRemover);
 
     final sender = _sender as ActivityRemover;
-    _activities.removeAt(sender.index);
+
+    final activity = _activities[sender.index];
+    if (activity is FutureActivity) {
+      activity.isHidden = true;
+    } else {
+      _activities.removeAt(sender.index);
+    }
   }
 
   void _onTrackActivity() {
@@ -72,14 +79,20 @@ class PlannerMediator {
 
     final sender = _sender as MoodTracker;
 
-    assert(_activities[sender.index] is PlannedActivity);
+    final activity = _activities[sender.index];
 
-    _activities.insert(
-        sender.index,
-        new TrackedActivity(
-            _activities[sender.index] as PlannedActivity, sender.mood));
-
-    _activities.removeAt(sender.index + 1);
+    if (activity is PlannedActivity) {
+      _activities.insert(
+          sender.index, new TrackedActivity(activity, sender.mood));
+      _activities.removeAt(sender.index + 1);
+    } else if (activity is FutureActivity) {
+      _activities.insert(
+          sender.index, new TrackedActivity(activity, sender.mood));
+      activity.isHidden = true;
+    } else {
+      // ! Can't be here
+      assert(false);
+    }
   }
 
   void _onReorderActivity() {
@@ -104,19 +117,21 @@ class PlannerMediator {
   }
 }
 
+final PlannerMediator = _PlannerMediator();
+
 class ActivityAdder {
   final Activity activity;
 
-  ActivityAdder({required PlannerMediator mediator, required this.activity}) {
-    mediator.notify(this);
+  ActivityAdder(this.activity) {
+    PlannerMediator.notify(this);
   }
 }
 
 class ActivityRemover {
   final int index;
 
-  ActivityRemover({required PlannerMediator mediator, required this.index}) {
-    mediator.notify(this);
+  ActivityRemover(this.index) {
+    PlannerMediator.notify(this);
   }
 }
 
@@ -124,31 +139,24 @@ class MoodTracker {
   final int index;
   final Mood mood;
 
-  MoodTracker(
-      {required PlannerMediator mediator,
-      required this.index,
-      required this.mood}) {
-    mediator.notify(this);
+  MoodTracker({required this.index, required this.mood}) {
+    PlannerMediator.notify(this);
   }
 }
 
 class ActivityReorderer {
   final int oldIndex, newIndex;
 
-  ActivityReorderer(
-      {required PlannerMediator mediator,
-      required this.oldIndex,
-      required this.newIndex}) {
-    mediator.notify(this);
+  ActivityReorderer({required this.oldIndex, required this.newIndex}) {
+    PlannerMediator.notify(this);
   }
 }
 
 class PlannerStateChanger {
   final PlannerState state;
 
-  PlannerStateChanger(
-      {required PlannerMediator mediator, required this.state}) {
-    mediator.notify(this);
+  PlannerStateChanger(this.state) {
+    PlannerMediator.notify(this);
   }
 }
 

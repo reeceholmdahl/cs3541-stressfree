@@ -25,8 +25,6 @@ class Planner extends StatefulWidget {
 }
 
 class _PlannerState extends State<Planner> {
-  final mediator = PlannerMediator();
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -49,20 +47,18 @@ class _PlannerState extends State<Planner> {
         ],
       ),
       body: AnimatedBuilder(
-        animation: mediator.notifier,
+        animation: PlannerMediator.notifier,
         builder: (context, child) {
-          return ActivityListView(mediator: mediator);
+          return ActivityListView();
         },
       ),
-      floatingActionButton: PlannerFab(mediator: mediator),
+      floatingActionButton: PlannerFab(),
     );
   }
 }
 
 class PlannerFab extends StatelessWidget {
-  final PlannerMediator mediator;
-
-  PlannerFab({required this.mediator});
+  PlannerFab();
 
   @override
   Widget build(BuildContext context) {
@@ -77,8 +73,7 @@ class PlannerFab extends StatelessWidget {
           color: Colors.teal,
           onPressed: () => showDialog(
             context: context,
-            builder: (context) =>
-                AddActivityDialog<FutureActivity>(mediator: mediator),
+            builder: (context) => AddActivityDialog<FutureActivity>(),
           ),
         ),
         ActionButton(
@@ -86,8 +81,7 @@ class PlannerFab extends StatelessWidget {
           color: Colors.green,
           onPressed: () => showDialog<void>(
             context: context,
-            builder: (context) =>
-                AddActivityDialog<TrackedActivity>(mediator: mediator),
+            builder: (context) => AddActivityDialog<TrackedActivity>(),
           ),
         ),
         ActionButton(
@@ -95,8 +89,7 @@ class PlannerFab extends StatelessWidget {
           color: Colors.blue,
           onPressed: () => showDialog<void>(
             context: context,
-            builder: (context) =>
-                AddActivityDialog<PlannedActivity>(mediator: mediator),
+            builder: (context) => AddActivityDialog<PlannedActivity>(),
           ),
         )
       ],
@@ -105,9 +98,7 @@ class PlannerFab extends StatelessWidget {
 }
 
 class AddActivityDialog<T extends Activity> extends StatefulWidget {
-  final PlannerMediator mediator;
-
-  AddActivityDialog({required this.mediator});
+  AddActivityDialog();
 
   @override
   State<AddActivityDialog<T>> createState() => _AddActivityDialogState<T>();
@@ -118,7 +109,7 @@ class _AddActivityDialogState<T extends Activity>
   final _formKey = GlobalKey<FormState>();
   final _textController = TextEditingController();
   late final MoodRater? moodRater;
-  late final FuturePlanner? futurePlanner;
+  late final RecurrencePicker? recurrencePicker;
 
   String activityName = '';
   ActivityCategory activityCategory = ActivityCategories.Null;
@@ -130,7 +121,7 @@ class _AddActivityDialogState<T extends Activity>
           (T == TrackedActivity
               ? moodRater!.selectedMood() != Moods.Null
               : true)) &&
-      (T == FutureActivity ? futurePlanner!.recurrence != null : true);
+      (T == FutureActivity ? recurrencePicker!.recurrence != null : true);
 
   void _addActivity() {
     var plannedActivity = PlannedActivity(activityName, activityCategory);
@@ -140,10 +131,12 @@ class _AddActivityDialogState<T extends Activity>
       activity = plannedActivity;
     else if (T == TrackedActivity)
       activity = TrackedActivity(plannedActivity, moodRater!.selectedMood());
+    else if (T == FutureActivity)
+      activity = FutureActivity(plannedActivity, recurrencePicker!.recurrence!);
 
     assert(activity != PresetActivities.Null);
 
-    ActivityAdder(mediator: widget.mediator, activity: activity);
+    ActivityAdder(activity);
     Navigator.pop(context);
   }
 
@@ -153,7 +146,7 @@ class _AddActivityDialogState<T extends Activity>
     if (T == TrackedActivity) {
       moodRater = MoodRater(onChanged: () => setState(() {}));
     } else if (T == FutureActivity) {
-      futurePlanner = FuturePlanner(onChanged: () => setState(() {}));
+      recurrencePicker = RecurrencePicker(onChanged: () => setState(() {}));
     }
   }
 
@@ -162,120 +155,127 @@ class _AddActivityDialogState<T extends Activity>
     return Form(
       key: _formKey,
       child: AlertDialog(
-        content: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Flexible(
-              flex: 5,
-              child: Stack(
-                children: [
-                  TextFormField(
-                    controller: _textController,
-                    style: TextStyle(
-                        color: isPresetActivity
-                            ? Colors.black.withOpacity(0.7)
-                            : null,
-                        fontWeight: isPresetActivity ? FontWeight.bold : null),
-                    decoration: InputDecoration(
-                      contentPadding: EdgeInsets.fromLTRB(8, 20, 36, 20),
-                      labelText: 'Enter an activity',
-                      filled: true,
-                      fillColor: activityCategory.color.shade100,
-                      border: OutlineInputBorder(),
-                    ),
-                    validator: (input) {
-                      if (input == null || input.isEmpty) {
-                        return 'Give this activity a name';
-                      } else if (input.length > 24) {
-                        return 'Shorten the activity name';
-                      }
+        contentPadding: EdgeInsets.fromLTRB(24, 20, 24, 10),
+        content: SingleChildScrollView(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Padding(
+                padding: const EdgeInsets.only(top: 8.0),
+                child: SizedBox(
+                  height: 100,
+                  child: Stack(
+                    children: [
+                      TextFormField(
+                        controller: _textController,
+                        style: TextStyle(
+                            color: isPresetActivity
+                                ? Colors.black.withOpacity(0.7)
+                                : null,
+                            fontWeight:
+                                isPresetActivity ? FontWeight.bold : null),
+                        decoration: InputDecoration(
+                          isDense: true,
+                          contentPadding: EdgeInsets.fromLTRB(8, 20, 36, 20),
+                          labelText: 'Enter an activity',
+                          filled: true,
+                          fillColor: activityCategory.color.shade100,
+                          border: OutlineInputBorder(),
+                        ),
+                        validator: (input) {
+                          if (input == null || input.isEmpty) {
+                            return 'Give this activity a name';
+                          } else if (input.length > 24) {
+                            return 'Shorten the activity name';
+                          }
 
-                      return null;
-                    },
-                    onChanged: (value) {
-                      setState(() {
-                        if (activityName != value) {
-                          isPresetActivity = false;
-                          activityName = value;
-                        }
-                      });
-                    },
-                    autovalidateMode: AutovalidateMode.always,
-                  ),
-                  Positioned(
-                    right: 0,
-                    top: 5,
-                    child: PopupMenuButton<PlannedActivity>(
-                      icon: Icon(Icons.arrow_drop_down,
-                          color: Colors.black.withOpacity(0.7)),
-                      iconSize: 30,
-                      onSelected: (PlannedActivity activity) => setState(() {
-                        _textController.text = activityName = activity.name;
-                        activityCategory = activity.category;
-                        isPresetActivity = true;
-                      }),
-                      itemBuilder: (context) {
-                        return [
-                          for (final activity in PresetActivitiesList)
-                            PopupMenuItem<PlannedActivity>(
-                                value: activity, child: Text(activity.name))
-                        ];
-                      },
-                    ),
-                  )
-                ],
-              ),
-            ),
-            Spacer(flex: 1),
-            Flexible(
-              flex: 5,
-              child: DropdownButtonFormField<ActivityCategory>(
-                style: Theme.of(context).textTheme.subtitle1?.copyWith(
-                    fontWeight: isPresetActivity ? FontWeight.bold : null),
-                value: (activityCategory == ActivityCategories.Null
-                    ? null
-                    : activityCategory),
-                // icon: const Icon(Icons.arrow_drop_down_circle_outlined),
-                iconEnabledColor: Colors.black.withOpacity(0.7),
-                iconDisabledColor: Colors.black.withOpacity(0.3),
-                iconSize: 30,
-                decoration: InputDecoration(
-                  filled: true,
-                  fillColor: activityCategory.color.shade400,
-                  border: OutlineInputBorder(),
-                ),
-                items: [
-                  for (final category in ActivityCategoriesList)
-                    DropdownMenuItem<ActivityCategory>(
-                        value: category, child: Text(category.name))
-                ],
-                validator: (select) {
-                  // log(select?.name ?? 'None');
-                  if (select == null &&
-                      activityCategory == ActivityCategories.Null) {
-                    return 'Select a category';
-                  }
-
-                  return null;
-                },
-                onChanged: isPresetActivity
-                    ? null
-                    : (category) => setState(
-                          () {
-                            activityCategory = category!;
+                          return null;
+                        },
+                        onChanged: (value) {
+                          setState(() {
+                            if (activityName != value) {
+                              isPresetActivity = false;
+                              activityName = value;
+                            }
+                          });
+                        },
+                        autovalidateMode: AutovalidateMode.always,
+                      ),
+                      Positioned(
+                        right: 0,
+                        top: 5,
+                        child: PopupMenuButton<PlannedActivity>(
+                          icon: Icon(Icons.arrow_drop_down,
+                              color: Colors.black.withOpacity(0.7)),
+                          iconSize: 30,
+                          onSelected: (PlannedActivity activity) =>
+                              setState(() {
+                            _textController.text = activityName = activity.name;
+                            activityCategory = activity.category;
+                            isPresetActivity = true;
+                          }),
+                          itemBuilder: (context) {
+                            return [
+                              for (final activity in PresetActivitiesList)
+                                PopupMenuItem<PlannedActivity>(
+                                    value: activity, child: Text(activity.name))
+                            ];
                           },
                         ),
+                      )
+                    ],
+                  ),
+                ),
               ),
-            ),
-            if (T == TrackedActivity) ...[
-              Spacer(flex: 1),
-              Flexible(flex: 5, child: moodRater!),
-            ] else if (T == FutureActivity) ...[
-              Spacer(flex: 1),
-              Flexible(flex: 12, child: futurePlanner!),
-            ]
-          ],
+              SizedBox(
+                height: 80,
+                child: DropdownButtonFormField<ActivityCategory>(
+                  hint: Text('Choose a category'),
+                  style: Theme.of(context).textTheme.subtitle1?.copyWith(
+                      fontWeight: isPresetActivity ? FontWeight.bold : null),
+                  value: (activityCategory == ActivityCategories.Null
+                      ? null
+                      : activityCategory),
+                  // icon: const Icon(Icons.arrow_drop_down_circle_outlined),
+                  iconEnabledColor: Colors.black.withOpacity(0.7),
+                  iconDisabledColor: Colors.black.withOpacity(0.3),
+                  iconSize: 30,
+                  decoration: InputDecoration(
+                    isDense: true,
+                    filled: true,
+                    fillColor: activityCategory.color.shade400,
+                    border: OutlineInputBorder(),
+                  ),
+                  items: [
+                    for (final category in ActivityCategoriesList)
+                      DropdownMenuItem<ActivityCategory>(
+                          value: category, child: Text(category.name))
+                  ],
+                  validator: (select) {
+                    if (select == null &&
+                        activityCategory == ActivityCategories.Null) {
+                      return 'Select a category';
+                    }
+
+                    return null;
+                  },
+                  onChanged: isPresetActivity
+                      ? null
+                      : (category) => setState(
+                            () {
+                              activityCategory = category!;
+                            },
+                          ),
+                ),
+              ),
+              if (T == TrackedActivity) ...[
+                moodRater!,
+              ] else if (T == FutureActivity) ...[
+                recurrencePicker!,
+              ]
+            ],
+          ),
         ),
         actionsAlignment: MainAxisAlignment.spaceBetween,
         actions: [
@@ -302,13 +302,11 @@ class _AddActivityDialogState<T extends Activity>
 }
 
 class ActivityListView extends StatelessWidget {
-  final PlannerMediator mediator;
-
-  ActivityListView({required this.mediator});
+  ActivityListView();
 
   @override
   Widget build(BuildContext context) {
-    final activities = mediator.activities;
+    final activities = PlannerMediator.activities;
 
     return Scrollbar(
       isAlwaysShown: true,
@@ -330,24 +328,25 @@ class ActivityListView extends StatelessWidget {
             data: Theme.of(context).copyWith(
                 canvasColor: Colors.transparent,
                 shadowColor: Colors.transparent),
-            child: ReorderableListView.builder(
+            child: ReorderableListView(
               /// TODO make restoration stack work
               /// TODO look into proxyDecorator
               restorationId: 'activitiesList',
-              onReorder: (oldIndex, newIndex) => ActivityReorderer(
-                  mediator: mediator, oldIndex: oldIndex, newIndex: newIndex),
-              itemCount: activities.length,
+              onReorder: (oldIndex, newIndex) =>
+                  ActivityReorderer(oldIndex: oldIndex, newIndex: newIndex),
               dragStartBehavior: DragStartBehavior.down,
-              itemBuilder: (BuildContext context, int index) {
-                final activity = activities[index];
-
-                return ActivityListItem(
-                    key: ValueKey(index),
-                    index: index,
-                    activity: activity,
-                    gradient: _makeGradient(index, activities),
-                    mediator: mediator);
-              },
+              children: [
+                for (int i = 0; i < activities.length; ++i)
+                  if (activities[i] is! FutureActivity ||
+                      ((activities[i] as FutureActivity).isToday &&
+                          !(activities[i] as FutureActivity).isHidden))
+                    ActivityListItem(
+                      key: ValueKey(i),
+                      index: i,
+                      activity: activities[i],
+                      gradient: _makeGradient(i, activities),
+                    )
+              ],
             ),
           ),
         ],
@@ -402,14 +401,12 @@ class ActivityListItem extends StatelessWidget {
       {Key? key,
       required this.activity,
       required this.index,
-      required this.gradient,
-      required this.mediator})
+      required this.gradient})
       : super(key: key);
 
   final Activity activity;
   final int index;
   final Gradient gradient;
-  final PlannerMediator mediator;
 
   @override
   Widget build(BuildContext context) {
@@ -426,8 +423,7 @@ class ActivityListItem extends StatelessWidget {
             child: InkWell(
               onDoubleTap: () {},
               onTap: () {
-                PlannerStateChanger(
-                    mediator: mediator, state: PlannerState(deleteMode: false));
+                PlannerStateChanger(PlannerState(deleteMode: false));
               },
               borderRadius: const BorderRadius.all(Radius.circular(8)),
               splashColor: activity.category.color.shade200,
@@ -445,7 +441,6 @@ class ActivityListItem extends StatelessWidget {
                           style: theme.textTheme.subtitle1)),
                   if (activity is PlannedActivity)
                     ActivityListItemActionIcon(
-                      mediator: mediator,
                       activity: activity,
                       index: index,
                       onPressed: () {
@@ -454,17 +449,13 @@ class ActivityListItem extends StatelessWidget {
                           builder: (context) => MoodRaterDialog(
                             activity: activity,
                             index: index,
-                            mediator: mediator,
                           ),
                         );
                       },
                     )
                   else
                     ActivityListItemActionIcon(
-                        mediator: mediator,
-                        onPressed: null,
-                        activity: activity,
-                        index: index),
+                        onPressed: null, activity: activity, index: index),
                 ],
               ),
             ),
@@ -476,7 +467,6 @@ class ActivityListItem extends StatelessWidget {
 }
 
 class ActivityListItemActionIcon extends StatelessWidget {
-  final PlannerMediator mediator;
   final VoidCallback? onPressed;
   final Activity activity;
   final int index;
@@ -484,25 +474,20 @@ class ActivityListItemActionIcon extends StatelessWidget {
   final deleteIcon = Icon(Icons.delete, color: Colors.black.withOpacity(0.7));
 
   ActivityListItemActionIcon(
-      {required this.mediator,
-      required this.onPressed,
-      required this.activity,
-      required this.index});
+      {required this.onPressed, required this.activity, required this.index});
 
   void _onLongPress() {
-    PlannerStateChanger(
-        mediator: mediator, state: PlannerState(deleteMode: true));
+    PlannerStateChanger(PlannerState(deleteMode: true));
   }
 
   void _onDelete() {
-    ActivityRemover(mediator: mediator, index: index);
-    PlannerStateChanger(
-        mediator: mediator, state: PlannerState(deleteMode: false));
+    ActivityRemover(index);
+    PlannerStateChanger(PlannerState(deleteMode: false));
   }
 
   @override
   Widget build(BuildContext context) {
-    final icon = mediator.state.deleteMode
+    final icon = PlannerMediator.state.deleteMode
         ? deleteIcon
         : Material(
             elevation: 2,
@@ -518,7 +503,7 @@ class ActivityListItemActionIcon extends StatelessWidget {
           );
 
     return CustomIconButton(
-      onPressed: mediator.state.deleteMode ? _onDelete : onPressed,
+      onPressed: PlannerMediator.state.deleteMode ? _onDelete : onPressed,
       onLongPress: _onLongPress,
       icon: icon,
       splashColor: activity.category.color.shade200,
@@ -542,38 +527,42 @@ class MoodRater extends StatefulWidget {
 class _MoodRaterState extends State<MoodRater> {
   @override
   Widget build(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-      children: [
-        for (final mood in MoodsList)
-          DecoratedBox(
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              border: Border.all(color: mood.color.shade300, width: 3),
-              color: widget._notifier.value == mood
-                  ? mood.color.shade300
-                  : mood.color.shade50,
-            ),
-            child: Material(
-              color: Colors.transparent,
-              shape: CircleBorder(),
-              child: InkWell(
-                splashColor: mood.color.shade200,
-                customBorder: CircleBorder(),
-                onTap: () {
-                  widget.onChanged();
-                  setState(() {
-                    widget._notifier.value = mood;
-                  });
-                },
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Icon(mood.iconData, size: 36),
+    return SizedBox(
+      height: 60,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          for (final mood in MoodsList)
+            DecoratedBox(
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                border: Border.all(color: mood.color.shade300, width: 3),
+                color: widget._notifier.value == mood
+                    ? mood.color.shade300
+                    : mood.color.shade50,
+              ),
+              child: Material(
+                color: Colors.transparent,
+                shape: CircleBorder(),
+                child: InkWell(
+                  splashColor: mood.color.shade200,
+                  customBorder: CircleBorder(),
+                  onTap: () {
+                    widget.onChanged();
+                    setState(() {
+                      widget._notifier.value = mood;
+                    });
+                  },
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Icon(mood.iconData, size: 36),
+                  ),
                 ),
               ),
-            ),
-          )
-      ],
+            )
+        ],
+      ),
     );
   }
 }
@@ -584,12 +573,10 @@ class MoodRaterDialog extends StatelessWidget {
     Key? key,
     required this.activity,
     required this.index,
-    required this.mediator,
   }) : super(key: key);
 
   final Activity activity;
   final int index;
-  final PlannerMediator mediator;
 
   @override
   Widget build(BuildContext context) {
@@ -623,10 +610,7 @@ class MoodRaterDialog extends StatelessWidget {
         ),
         TextButton(
           onPressed: () {
-            MoodTracker(
-                mediator: mediator,
-                index: index,
-                mood: moodRater.selectedMood());
+            MoodTracker(index: index, mood: moodRater.selectedMood());
             Navigator.of(context).pop();
           },
           child: const Text('Track'),
@@ -636,10 +620,10 @@ class MoodRaterDialog extends StatelessWidget {
   }
 }
 
-class FuturePlanner extends StatefulWidget {
+class RecurrencePicker extends StatefulWidget {
   VoidCallback onChanged;
 
-  FuturePlanner({required this.onChanged});
+  RecurrencePicker({required this.onChanged});
 
   final String _onDate = 'Does not repeat';
 
@@ -651,10 +635,10 @@ class FuturePlanner extends StatefulWidget {
   Recurrence? recurrence;
 
   @override
-  State<FuturePlanner> createState() => _FuturePlannerState();
+  State<RecurrencePicker> createState() => _RecurrencePickerState();
 }
 
-class _FuturePlannerState extends State<FuturePlanner> {
+class _RecurrencePickerState extends State<RecurrencePicker> {
   String type = '';
   DateTime onDate = DateTime.now().add(Duration(hours: 24));
   DateTime startDate = DateTime.now();
@@ -778,8 +762,8 @@ class _FuturePlannerState extends State<FuturePlanner> {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Flexible(
-          flex: 5,
+        SizedBox(
+          height: 80,
           child: DropdownButtonFormField<String>(
             hint: Text('Choose a recurrence...',
                 style: TextStyle(color: Colors.grey.shade600)),
@@ -805,15 +789,14 @@ class _FuturePlannerState extends State<FuturePlanner> {
           ),
         ),
         if (type.isNotEmpty) ...[
-          Spacer(flex: 1),
-          Flexible(
-            flex: type == widget._weekly ? 5 : 3,
-            child: Builder(builder: (BuildContext context) {
-              final columnChildren = <Widget>[];
-              if (type == widget._onDate) {
-                return makeOnDatePicker(context);
-              } else {
-                columnChildren.add(Row(
+          Builder(builder: (BuildContext context) {
+            final columnChildren = <Widget>[];
+            if (type == widget._onDate) {
+              return makeOnDatePicker(context);
+            } else {
+              columnChildren.add(SizedBox(
+                height: 75,
+                child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
                     Column(
@@ -833,29 +816,33 @@ class _FuturePlannerState extends State<FuturePlanner> {
                       ],
                     ),
                   ],
-                ));
-              }
+                ),
+              ));
+            }
 
-              if (type == widget._daily ||
-                  type == widget._monthly ||
-                  type == widget._yearly) {
-                return Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: columnChildren,
-                );
-              } else if (type == widget._weekly) {
-                return Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    ...columnChildren,
-                    Padding(
-                        padding: EdgeInsets.only(top: 5, bottom: 5),
-                        child: Text(
-                          'Days',
-                          style: TextStyle(color: Colors.grey.shade700),
-                          textAlign: TextAlign.center,
-                        )),
-                    StatefulBuilder(
+            if (type == widget._daily ||
+                type == widget._monthly ||
+                type == widget._yearly) {
+              return Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: columnChildren,
+              );
+            } else if (type == widget._weekly) {
+              return Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  ...columnChildren,
+                  SizedBox(
+                    height: 25,
+                    child: Text(
+                      'Days',
+                      style: TextStyle(color: Colors.grey.shade700),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                  SizedBox(
+                    height: 40,
+                    child: StatefulBuilder(
                       builder: (BuildContext context, StateSetter setState) {
                         return Row(
                           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -890,15 +877,15 @@ class _FuturePlannerState extends State<FuturePlanner> {
                           ],
                         );
                       },
-                    )
-                  ],
-                );
-              }
+                    ),
+                  )
+                ],
+              );
+            }
 
-              // ! should not be possible to get here
-              throw UnimplementedError();
-            }),
-          ),
+            // ! Should be impossible to get here
+            throw UnimplementedError();
+          }),
         ]
       ],
     );

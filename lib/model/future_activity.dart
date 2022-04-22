@@ -1,14 +1,14 @@
 import 'package:firstapp/model/planned_activity.dart';
 
+import 'activity.dart';
+
 class FutureActivity extends PlannedActivity {
   final Recurrence recurrence;
+  bool isHidden = false;
+  bool get isToday => recurrence.isToday();
 
-  FutureActivity({required activity, required this.recurrence})
+  FutureActivity(Activity activity, this.recurrence)
       : super(activity.name, activity.category);
-
-  bool isToday() {
-    return recurrence.isToday();
-  }
 }
 
 class Recurrence {
