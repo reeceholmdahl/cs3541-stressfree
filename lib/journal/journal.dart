@@ -18,7 +18,9 @@ class journal extends StatelessWidget {
       home: Scaffold(
         appBar: AppBar(
           title: const Text(appTitle),
+          backgroundColor: Color.fromRGBO(25, 32, 30, 1),
         ),
+        backgroundColor: Color.fromRGBO(201, 189, 182, 1),
         resizeToAvoidBottomInset: false,
         drawer: sideDrawerLeft(),
         body: journalArea(),
@@ -31,7 +33,7 @@ class journalArea extends StatelessWidget {
   var _mood = Mood.nullMood;
   final titleController = TextEditingController();
   final controller = TextEditingController();
-  var moodColor = Colors.white;
+  var moodColor = Color.fromRGBO(201, 189, 182, 1);
   var moodIcon = Icons.visibility_off_sharp;
   journalArea({Key? key}) : super(key: key);
 
@@ -125,6 +127,8 @@ class journalArea extends StatelessWidget {
                 maxLines: 1,
                 decoration: InputDecoration.collapsed(
                   hintText: "Title",
+                  fillColor: Color.fromRGBO(157, 180, 165, 100),
+                  filled: true,
                 ),
               ),
             )
@@ -138,6 +142,8 @@ class journalArea extends StatelessWidget {
                 maxLines: 17,
                 decoration: InputDecoration.collapsed(
                     hintText: "Write about your day here!",
+                    fillColor: Color.fromRGBO(157, 180, 165, 100),
+                    filled: true,
                 ),
               ),
             )
@@ -149,7 +155,7 @@ class journalArea extends StatelessWidget {
               children: <Widget>[
                 ElevatedButton(
                   style: ElevatedButton.styleFrom(
-                    primary: Colors.red,
+                    primary: Color.fromRGBO(157,	180,	165, 100),
                     fixedSize: const Size(180, 60),
                   ),
                   child: Text(
@@ -168,7 +174,7 @@ class journalArea extends StatelessWidget {
                 ),
                 ElevatedButton(
                   style: ElevatedButton.styleFrom(
-                    primary: Colors.blue,
+                    primary: Color.fromRGBO(157, 180, 165, 100),
                     fixedSize: const Size(180, 60),
                   ),
                   child: Text(

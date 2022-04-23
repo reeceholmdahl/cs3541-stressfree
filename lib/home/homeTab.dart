@@ -49,8 +49,10 @@ class homeTabState extends State<homeTab> {
   Widget buildPage(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: Color.fromRGBO(25, 32, 30, 1),
         title: const Text("Home"),
       ),
+      backgroundColor: Color.fromRGBO(201, 189, 182, 1),
       drawer: widget.sideDrawer,
       body: ListView.builder(
             itemCount: homePageItemsList.length,

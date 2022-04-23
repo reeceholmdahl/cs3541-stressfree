@@ -39,7 +39,7 @@ class readMore extends StatelessWidget {
       children: <Widget>[
         Container(
           padding: EdgeInsets.all(40.0),
-          decoration: BoxDecoration(color: Color.fromRGBO(0, 0, 255, .9)),
+          decoration: BoxDecoration(color: Color.fromRGBO(157,	180,	165, 10)),
           child: Center(
             child: topContentText,
           ),
@@ -75,6 +75,7 @@ class readMore extends StatelessWidget {
       body: Column(
         children: <Widget>[topContent, bottomContent],
       ),
+      backgroundColor: Color.fromRGBO(201, 189, 182, 10),
       resizeToAvoidBottomInset: false,
     );
   }

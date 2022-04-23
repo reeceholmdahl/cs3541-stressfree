@@ -15,8 +15,10 @@ class stressManagement extends StatelessWidget {
       title: appTitle,
       home: Scaffold(
         appBar: AppBar(
+          backgroundColor: Color.fromRGBO(25, 32, 30, 1),
           title: const Text(appTitle),
         ),
+        backgroundColor: Color.fromRGBO(201, 189, 182, 10),
         resizeToAvoidBottomInset: false,
         drawer: sideDrawerLeft(),
         body: ListPage(),
@@ -72,7 +74,7 @@ class _ListPageState extends State<ListPage> {
       elevation: 8.0,
       margin: new EdgeInsets.symmetric(horizontal: 10.0, vertical: 6.0),
       child: Container(
-        decoration: BoxDecoration(color: Color.fromRGBO(0, 0, 255, .9)),
+        decoration: BoxDecoration(color: Color.fromRGBO(157,	180,	165, 10)),
         child: makeListTile(technique),
       ),
     );

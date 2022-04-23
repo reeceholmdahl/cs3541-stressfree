@@ -78,6 +78,7 @@ class pastJournal extends StatelessWidget {
       body: Column(
         children: <Widget>[topContent, bottomContent],
       ),
+      backgroundColor: Color.fromRGBO(201, 189, 182, 1),
       resizeToAvoidBottomInset: false,
     );
   }

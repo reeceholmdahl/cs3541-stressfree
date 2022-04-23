@@ -10,12 +10,13 @@ class historyView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const appTitle = 'Stress Management Techniques';
+    const appTitle = 'Saved Journals';
     return MaterialApp(
       title: appTitle,
       home: Scaffold(
         appBar: AppBar(
           title: const Text(appTitle),
+          backgroundColor: Color.fromRGBO(25, 32, 30, 1),
           automaticallyImplyLeading: false,
           leading: new IconButton(
             icon: new Icon(Icons.arrow_back, color: Colors.white),
@@ -100,6 +101,7 @@ class _ListPageState extends State<ListPage> {
 
     return Scaffold(
       body: makeBody,
+      backgroundColor: Color.fromRGBO(201, 189, 182, 1),
       resizeToAvoidBottomInset: false,
     );
   }

@@ -13,6 +13,7 @@ class sideDrawerLeft extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Drawer(
+      backgroundColor: Color.fromRGBO(	201, 189, 182, 10),
       child: ListView(
         padding: EdgeInsets.zero,
         children: [
@@ -25,7 +26,6 @@ class sideDrawerLeft extends StatelessWidget {
                 image: NetworkImage('https://cdn.sixtyandme.com/wp-content/uploads/2020/12/iStock-848645812-scaled.jpg'),
                 fit: BoxFit.cover,
               ),
-
               //color: Colors.blue,
               //alignment: Alignment.center,
             ),
