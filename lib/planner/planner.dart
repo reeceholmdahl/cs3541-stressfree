@@ -41,8 +41,8 @@ class _ActivityTrackerState extends State<ActivityTracker> {
   void pushActivity(String activity, String category, String mood) {
     final String date = getDate();
     databaseRef.child("/$date/Mood").push().set({"Mood": mood});
-    databaseRef.child("/$date/Activity").push().set({"Mood": activity});
-    databaseRef.child("/$date/Category").push().set({"Mood": category});
+    databaseRef.child("/$date/Activity").push().set({"Activity": activity});
+    databaseRef.child("/$date/Category").push().set({"Category": category});
 
   }
 
