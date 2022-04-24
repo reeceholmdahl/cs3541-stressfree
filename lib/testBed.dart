@@ -38,7 +38,7 @@ class _TestPageState extends State<TestPage> {
     print(data);
   }
 
-    void addData(String data) {
+  void addData(String data) {
     databaseRef.push().set({'Name': data, 'Date': DateTime.now().toString()});
   }
 
@@ -70,7 +70,7 @@ class _TestPageState extends State<TestPage> {
                     SizedBox(height: 30.0),
                     Row(
                         children: <Widget>[
-                           RaisedButton(
+                          RaisedButton(
                               color: Colors.pinkAccent,
                               child: Text("Save to Database"),
                               onPressed: () {
@@ -114,7 +114,7 @@ class _TestPageState extends State<TestPage> {
                                 //call method flutter upload
                               }
                           )
-            ]
+                        ]
                     )
 
                   ],
