@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_database/ui/firebase_animated_list.dart';
+import 'dart:convert';
 
 class TestPage extends StatefulWidget {
   @override
@@ -22,7 +23,7 @@ class _TestPageState extends State<TestPage> {
   Future<String> pullData() async
   {
 
-    DatabaseReference ref = FirebaseDatabase.instance.ref('Messages');
+    final ref = FirebaseDatabase.instance.ref('Messages');
     DatabaseEvent event = await ref.once();
 
     return (event.snapshot.value.toString());
@@ -34,13 +35,15 @@ class _TestPageState extends State<TestPage> {
 
   Future<void> fetchData () async
   {
-    var data =  await pullData();
-    print(data);
+    final data = await pullData();
+    String returnData = data;
+    print(returnData);
   }
 
   void addData(String data) {
     databaseRef.push().set({'Name': data, 'Date': DateTime.now().toString()});
   }
+
 
 
 
@@ -52,8 +55,8 @@ class _TestPageState extends State<TestPage> {
         title: Text("Firebase Demo"),
       ),
       body: FutureBuilder(
-          future: Firebase.initializeApp(),
-          builder: (context, snapshot) {
+          future: pullData(),
+          builder: (context, AsyncSnapshot<String> snapshot) {
             if (snapshot.hasError) {
               return Text(snapshot.error.toString());
             } else {
@@ -96,12 +99,12 @@ class _TestPageState extends State<TestPage> {
                               color: Colors.pinkAccent,
                               child: Text("Pull From DB"),
                               onPressed: () {
-                                fetchData();
+
                                 showDialog<String>(
                                     context: context,
                                     builder: (BuildContext context) => AlertDialog(
                                       title: const Text('Pull test'),
-                                      content:  Text("null"),
+                                      content:  Text(snapshot.toString()),
                                       actions: <Widget>[
                                         TextButton(
                                           onPressed: () => Navigator.pop(context, 'OK'),
