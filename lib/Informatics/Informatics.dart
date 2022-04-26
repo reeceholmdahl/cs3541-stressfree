@@ -24,6 +24,7 @@ class Informatics extends StatelessWidget {
         primarySwatch: Colors.blueGrey,
         brightness: Brightness.dark,
       ),
+
       home: HomePage(),
     );
   }
@@ -143,7 +144,9 @@ class _HomePageState extends State<HomePage> {
         drawer: sideDrawerLeft(),
         appBar: AppBar(
           title: const Text('Informatics'),
+          backgroundColor: Color.fromRGBO(25, 32, 30, 1),
         ),
+        backgroundColor: Color.fromRGBO(201, 189, 182, 1),
         body: FutureBuilder(
             future: pullData(),
             builder: (context, AsyncSnapshot<String> snapshot) {

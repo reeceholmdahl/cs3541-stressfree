@@ -83,8 +83,10 @@ class TestState extends State<Test> {
   Widget build(BuildContext context) {
     return Scaffold(
       drawer: sideDrawerLeft(),
+      backgroundColor: Color.fromRGBO(201, 189, 182, 1),
       appBar: AppBar(
         title: const Text('Alarm Page'),
+        backgroundColor: Color.fromRGBO(25, 32, 30, 1),
       ),
       body: Center(
         child: Column(
@@ -103,7 +105,7 @@ class TestState extends State<Test> {
               IconButton(
                 icon: const Icon(Icons.add_circle_rounded),
                 color: Colors.lightBlue,
-                iconSize: 60,
+                iconSize: 100,
                 onPressed: () {
                   buildNewAlarmPopup(context);
                 },
@@ -281,7 +283,7 @@ class AlarmIcon extends StatelessWidget {
         IconButton(
           icon: const Icon(Icons.access_alarms),
           color: Colors.pink,
-          iconSize: 100.0,
+          iconSize: 200.0,
 
           onPressed: () {
             FlutterAlarmClock.showAlarms();
