@@ -64,7 +64,7 @@ class Home extends StatelessWidget {
             children: [
               PageCard(
                 name: 'Tip of the Day',
-                color: Theme.of(context).canvasColor,
+                color: Colors.teal.shade400,
                 onPressed: () => Navigator.push(
                   context,
                   MaterialPageRoute<void>(
@@ -74,7 +74,7 @@ class Home extends StatelessWidget {
               ),
               PageCard(
                 name: 'Planner',
-                color: Theme.of(context).canvasColor,
+                color: Colors.pink.shade400,
                 onPressed: () => Navigator.push(
                   context,
                   MaterialPageRoute<void>(
@@ -84,7 +84,7 @@ class Home extends StatelessWidget {
               ),
               PageCard(
                 name: 'Informatics',
-                color: Theme.of(context).canvasColor,
+                color: Colors.cyan.shade400,
                 onPressed: () => Navigator.push(
                   context,
                   MaterialPageRoute<void>(
@@ -94,7 +94,7 @@ class Home extends StatelessWidget {
               ),
               PageCard(
                 name: 'Alarms',
-                color: Theme.of(context).canvasColor,
+                color: Colors.yellow.shade400,
                 onPressed: () => Navigator.push(
                   context,
                   MaterialPageRoute<void>(
@@ -104,7 +104,7 @@ class Home extends StatelessWidget {
               ),
               PageCard(
                 name: 'Soothing Music',
-                color: Theme.of(context).canvasColor,
+                color: Colors.indigo.shade400,
                 onPressed: () => Navigator.push(
                   context,
                   MaterialPageRoute<void>(

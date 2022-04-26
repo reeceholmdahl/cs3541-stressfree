@@ -7,16 +7,13 @@ class TipOfTheDay extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: "Tip of the Day",
-      home: Scaffold(
-        appBar: AppBar(
-          title: const Text("Tip of the Day"),
-        ),
-        resizeToAvoidBottomInset: false,
-        drawer: SideDrawer(),
-        body: TipBody(),
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text("Tip of the Day"),
       ),
+      resizeToAvoidBottomInset: false,
+      drawer: SideDrawer(),
+      body: TipBody(),
     );
   }
 }
