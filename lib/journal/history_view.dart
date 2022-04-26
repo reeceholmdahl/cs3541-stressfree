@@ -1,7 +1,7 @@
 import 'package:firstapp/journal/past_journal.dart';
 import 'package:flutter/material.dart';
 
-import 'readable_data/readable.dart';
+import '../model/readable.dart';
 import 'readable_data/readable_list.dart';
 
 class HistoryView extends StatelessWidget {
@@ -36,7 +36,7 @@ class _ListPageState extends State<ListPage> {
 
   @override
   void initState() {
-    readable = getReadable();
+    readable = getReadables();
     super.initState();
   }
 

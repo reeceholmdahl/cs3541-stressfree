@@ -4,41 +4,32 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-import 'side_drawer.dart';
+import '../side_drawer.dart';
 import 'video_list.dart';
 
 class YoutubeStressPage extends StatelessWidget {
   const YoutubeStressPage({Key? key}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        drawer: SideDrawer(),
-        resizeToAvoidBottomInset: false,
-        appBar: AppBar(
-          leading: Padding(
-            padding: const EdgeInsets.only(left: 12.0),
-            child: Image.asset(
-              'assets/ypf.png',
-              fit: BoxFit.fitWidth,
-            ),
-          ),
-          title: const Text(
-            'Stress Management Techniques',
-            style: TextStyle(color: Colors.white),
-          ),
-          actions: [
-            IconButton(
-              icon: const Icon(Icons.video_library),
-              onPressed: () => Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => VideoList(),
-                ),
+      drawer: SideDrawer(),
+      appBar: AppBar(
+        title: const Text('Stress Release Videos'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.video_library),
+            onPressed: () => Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => VideoList(),
               ),
             ),
-          ],
-        ),
-        body: MyHomePage());
+          ),
+        ],
+      ),
+      body: MyHomePage(),
+    );
   }
 }
 
@@ -150,7 +141,6 @@ class _MyHomePageState extends State<MyHomePage> {
           _showSnackBar('Next Video Started!');
         },
       ),
-<<<<<<< HEAD:lib/youtube_stress.dart
       builder: (context, player) => ListView(
         children: [
           player,
@@ -167,49 +157,6 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
           ),
         ],
-=======
-      builder: (context, player) => Scaffold(
-        drawer: sideDrawerLeft(),
-        appBar: AppBar(
-          backgroundColor: Color.fromRGBO(25, 32, 30, 1),
-          leading: Padding(
-            padding: const EdgeInsets.only(left: 12.0),
-          ),
-          title: const Text(
-            'Stress Management Techniques',
-            style: TextStyle(color: Colors.white),
-          ),
-          actions: [
-            IconButton(
-              icon: const Icon(Icons.video_library),
-              onPressed: () => Navigator.push(
-                context,
-                CupertinoPageRoute(
-                  builder: (context) => VideoList(),
-                ),
-              ),
-            ),
-          ],
-        ),
-        backgroundColor: Color.fromRGBO(201, 189, 182, 1),
-        body: ListView(
-          children: [
-            player,
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  _space,
-                  _text('Title', _videoMetaData.title),
-                  _space,
-                  _text('Channel', _videoMetaData.author),
-                ],
-              ),
-            ),
-          ],
-        ),
->>>>>>> a329cbfe442af7339bc3043d43bc26833701a4bf:lib/youtubeStress.dart
       ),
     );
   }

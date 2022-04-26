@@ -1,7 +1,7 @@
 import 'package:firstapp/journal/journal.dart';
 import 'package:firstapp/main.dart';
-import 'package:firstapp/stress_management/stress_management.dart';
-import 'package:firstapp/youtube_stress.dart';
+import 'package:firstapp/stress_release_videos/video_list.dart';
+import 'package:firstapp/stress_release_videos/youtube_stress.dart';
 import 'package:flutter/material.dart';
 import 'package:firstapp/self_care/self_care.dart';
 
@@ -19,8 +19,7 @@ class SideDrawer extends StatelessWidget {
             decoration: BoxDecoration(
               color: const Color(0xff7c94b6),
               image: const DecorationImage(
-                image: NetworkImage(
-                    'https://cdn.sixtyandme.com/wp-content/uploads/2020/12/iStock-848645812-scaled.jpg'),
+                image: AssetImage('assets/side_drawer_image.jpg'),
                 fit: BoxFit.cover,
               ),
               //color: Colors.blue,
@@ -57,9 +56,11 @@ class SideDrawer extends StatelessWidget {
             onTap: () {
               Navigator.pop(context);
               Navigator.push<void>(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => const YoutubeStressPage()));
+                context,
+                MaterialPageRoute(
+                  builder: (context) => VideoList(),
+                ),
+              );
             },
           ),
           ListTile(
@@ -69,7 +70,7 @@ class SideDrawer extends StatelessWidget {
               Navigator.push<void>(
                   context,
                   MaterialPageRoute(
-                      builder: (context) => const StressManagement()));
+                      builder: (context) => const YoutubeStressPage()));
             },
           ),
           ListTile(

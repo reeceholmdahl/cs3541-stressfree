@@ -1,9 +1,10 @@
-import 'package:firstapp/side_drawer.dart';
 import 'package:flutter/material.dart';
 
+import 'package:firstapp/constants.dart';
+import 'package:firstapp/side_drawer.dart';
+import 'package:firstapp/model/technique.dart';
+
 import 'read_more.dart';
-import 'techniques_data/technique.dart';
-import 'techniques_data/techniques_list.dart';
 
 class StressManagement extends StatelessWidget {
   const StressManagement({Key? key}) : super(key: key);
@@ -22,21 +23,8 @@ class StressManagement extends StatelessWidget {
   }
 }
 
-class ListPage extends StatefulWidget {
+class ListPage extends StatelessWidget {
   ListPage({Key? key}) : super(key: key);
-
-  @override
-  _ListPageState createState() => _ListPageState();
-}
-
-class _ListPageState extends State<ListPage> {
-  late List techniques;
-
-  @override
-  void initState() {
-    techniques = getTechniques();
-    super.initState();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -80,9 +68,9 @@ class _ListPageState extends State<ListPage> {
       child: ListView.builder(
         scrollDirection: Axis.vertical,
         shrinkWrap: true,
-        itemCount: techniques.length,
+        itemCount: TechniquesList.length,
         itemBuilder: (BuildContext context, int index) {
-          return makeCard(techniques[index]);
+          return makeCard(TechniquesList[index]);
         },
       ),
     );

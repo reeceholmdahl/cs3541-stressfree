@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 
-import 'side_drawer.dart';
+import 'package:firstapp/side_drawer.dart';
 
 /// Creates list of video players
 class VideoList extends StatefulWidget {
@@ -26,15 +26,9 @@ class _VideoListState extends State<VideoList> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Color.fromRGBO(25, 32, 30, 1),
-        title: const Text('Stress Management Technique List'),
+        title: const Text('Stress Release Videos List'),
       ),
-<<<<<<< HEAD
       drawer: SideDrawer(),
-=======
-      drawer: sideDrawerLeft(),
-      backgroundColor: Color.fromRGBO(201, 189, 182, 1),
->>>>>>> a329cbfe442af7339bc3043d43bc26833701a4bf
       body: ListView.separated(
         itemBuilder: (context, index) {
           return YoutubePlayer(

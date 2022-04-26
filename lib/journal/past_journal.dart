@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'readable_data/readable.dart';
+import '../model/readable.dart';
 
 class PastJournal extends StatelessWidget {
   final Readable readable;

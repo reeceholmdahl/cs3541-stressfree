@@ -1,23 +1,15 @@
-import 'dart:ui';
-
+import 'package:firstapp/model/readable.dart';
 import 'package:flutter/material.dart';
 
-import 'readable.dart';
+final List<Readable> _readableList = [];
 
-var readableList = [
-
-  ];
-
-
-inputReadable(var icon, var color, var title, var content) {
-  readableList.add(Readable(
-    icon: icon,
-    color: color,
-    title: content,
-    content: title),
+inputReadable(
+    IconData icon, MaterialColor color, String title, String content) {
+  _readableList.add(
+    Readable(icon: icon, color: color, title: content, content: title),
   );
 }
 
-getReadable() {
-  return readableList;
+getReadables() {
+  return _readableList;
 }

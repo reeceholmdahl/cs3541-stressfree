@@ -1,56 +1,23 @@
-import 'dart:convert';
 import 'dart:math' as math;
 import 'dart:async';
-import 'dart:io';
 
 import 'package:firebase_database/firebase_database.dart';
+import 'package:firstapp/constants.dart';
 import 'package:flutter/material.dart';
-import 'package:path_provider/path_provider.dart';
-import 'package:firstapp/data/mood.dart';
 import 'package:pie_chart/pie_chart.dart';
 
-<<<<<<< HEAD
-import '../side_drawer.dart';
+import 'side_drawer.dart';
 
 enum LegendShape { Circle, Rectangle }
 
 class Informatics extends StatefulWidget {
   const Informatics({Key? key}) : super(key: key);
-=======
-import '../drawer.dart';
-
-class Informatics extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: 'Pie Chart Demo',
-      theme: ThemeData(
-        primarySwatch: Colors.blueGrey,
-      ),
-      darkTheme: ThemeData(
-        primarySwatch: Colors.blueGrey,
-        brightness: Brightness.dark,
-      ),
-
-      home: HomePage(),
-    );
-  }
-}
-
-enum LegendShape { Circle, Rectangle }
-
-class HomePage extends StatefulWidget {
-  const HomePage({Key? key}) : super(key: key);
->>>>>>> a329cbfe442af7339bc3043d43bc26833701a4bf
 
   @override
   _InformaticsState createState() => _InformaticsState();
 }
 
 class _InformaticsState extends State<Informatics> {
-  late final CounterStorage counterStorage;
-
   final dataMap = <String, double>{
     "Great": 5,
     "Good": 3,
@@ -58,8 +25,6 @@ class _InformaticsState extends State<Informatics> {
     "Bad": 2,
   };
 
-<<<<<<< HEAD
-=======
   Future<String> pullData() async {
     final ref = FirebaseDatabase.instance.ref('Planner');
     DatabaseEvent event = await ref.once();
@@ -69,7 +34,6 @@ class _InformaticsState extends State<Informatics> {
     return myString;
     //return event.snapshot.children.first.toString();
   }
-
 
   String insertChar(String endString, int pos, String toInsert) {
     endString = endString.substring(0, pos + 1) +
@@ -84,12 +48,11 @@ class _InformaticsState extends State<Informatics> {
     return endString;
   }
 
->>>>>>> a329cbfe442af7339bc3043d43bc26833701a4bf
   final colorList = <Color>[
-    (Mood.moods["great"]!.color),
-    Mood.moods["good"]!.color,
-    Mood.moods["medium"]!.color,
-    Mood.moods["bad"]!.color,
+    Moods.Great.color,
+    Moods.Good.color,
+    Moods.Medium.color,
+    Moods.Bad.color,
   ];
 
   ChartType? _chartType = ChartType.disc;
@@ -119,28 +82,6 @@ class _InformaticsState extends State<Informatics> {
     return showDialog(
         context: context,
         builder: (context) {
-<<<<<<< HEAD
-          return AlertDialog(
-            title: Text(title),
-            content: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  "When you were " + title + " you did ",
-                ),
-                Container(
-                    height: 200,
-                    width: 200,
-                    child: ListView.builder(
-                        itemCount: activityList.length,
-                        itemBuilder: (BuildContext context, int index) {
-                          return Text(activityList.elementAt(index));
-                        }))
-              ],
-            ),
-            actions: <Widget>[],
-          );
-=======
           return Wrap(children: [
             AlertDialog(
               title: Text(title),
@@ -156,53 +97,22 @@ class _InformaticsState extends State<Informatics> {
                       child: ListView.builder(
                           itemCount: activityList.length,
                           itemBuilder: (BuildContext context, int index) {
-                            return Text(activityList.elementAt(index),);
+                            return Text(
+                              activityList.elementAt(index),
+                            );
                           }))
                 ],
               ),
               actions: <Widget>[],
             )
           ]);
->>>>>>> a329cbfe442af7339bc3043d43bc26833701a4bf
         }); //showDialog
-  }
-  @override
-  void initState() {
-    super.initState();
-    counterStorage = CounterStorage();
-    super.initState();
-    counterStorage.readCounter().then((String value) {
-      setState(() {
-        myString = value;
-      });
-    });
   }
 
   @override
   Widget build(BuildContext context) {
-
-<<<<<<< HEAD
     //do action, maybe not needed for this application
 
-    Future<File> _incrementCounter(String value) {
-      setState(() {
-        myString = value;
-      });
-
-      // Write the variable as a string to the file.
-      return counterStorage.writeCounter(myString);
-    }
-
-=======
-
-    @override
-    void initState() {
-      super.initState();
-    }
-
-    //do action, maybe not needed for this application
-
->>>>>>> a329cbfe442af7339bc3043d43bc26833701a4bf
     //final dataMap = readDataFromFile();
 
     return Scaffold(
@@ -237,7 +147,7 @@ class _InformaticsState extends State<Informatics> {
                           showChartValueBackground: _showChartValueBackground,
                           showChartValues: _showChartValues,
                           showChartValuesInPercentage:
-                          _showChartValuesInPercentage,
+                              _showChartValuesInPercentage,
                           showChartValuesOutside: _showChartValuesOutside,
                         ),
                         ringStrokeWidth: _ringStrokeWidth!,
@@ -255,24 +165,25 @@ class _InformaticsState extends State<Informatics> {
                             return TextButton(
                               style: ButtonStyle(
                                 foregroundColor:
-                                MaterialStateProperty.all<Color>(
-                                    colorList.elementAt(index)),
+                                    MaterialStateProperty.all<Color>(
+                                        colorList.elementAt(index)),
                               ),
                               onPressed: () {
                                 for (int i = 0; i < dataMap.length; ++i) {
                                   if (index == i) {
-
                                     buildNewPopup(
                                         context,
-                                        dataMap.keys.elementAt(index), //fix this
-                                        generateMoodActivityLists(snapshot.toString())
+                                        dataMap.keys
+                                            .elementAt(index), //fix this
+                                        generateMoodActivityLists(
+                                                snapshot.toString())
                                             .elementAt(i)); //very inefficient
                                   }
                                 }
                               },
                               child: Center(
                                   child:
-                                  Text('${dataMap.keys.elementAt(index)}')),
+                                      Text('${dataMap.keys.elementAt(index)}')),
                             );
                           }),
                     ),
@@ -313,58 +224,44 @@ class _InformaticsState extends State<Informatics> {
   }
 
   List<List<String>> generateMoodActivityLists(String data) {
-
     String theString = "";
     List<String> list1 = [];
-    List<String> list2= [];
-    List<String> list3= [];
-    List<String> list4= [];
-
+    List<String> list2 = [];
+    List<String> list3 = [];
+    List<String> list4 = [];
 
     int j = 0;
-
 
     for (int i = 0; i < data.length; ++i) {
       if (data[i] == '{') {
         while (data[i + j] != '}') {
           ++j;
           if (data[i + j] == '{') {
-
-            j=0;
+            j = 0;
             break;
           }
-
         }
 
-        if(data[i+j] == '}') {
+        if (data[i + j] == '}') {
+          for (int k = i; k < i + j + 1; ++k) {
+            if (data.substring(k, k + 8) == "Activity") {
+              theString = data.substring(k + 10, i + j);
 
-          for(int k=i; k < i+j+1; ++k) {
-            if(data.substring(k, k+8) == "Activity") {
-              theString = data.substring(k+10, i+j);
-
-
-
-              if(data.substring(i, i+j+1).contains(": Great")) {
-                if(!list1.contains(theString))
-                  list1.add(theString);
-              } else if(data.substring(i,  i+j+1).contains(": Good")) {
-                if(!list2.contains(theString))
-                  list2.add(theString);
-              } else if(data.substring(i,  i+j+1).contains(": Medium")) {
-                if(!list3.contains(theString))
-                  list3.add(theString);
-              }
-              else if(data.substring(i,  i+j+1).contains(": Bad")) {
-                if(!list4.contains(theString))
-                  list4.add(theString);
+              if (data.substring(i, i + j + 1).contains(": Great")) {
+                if (!list1.contains(theString)) list1.add(theString);
+              } else if (data.substring(i, i + j + 1).contains(": Good")) {
+                if (!list2.contains(theString)) list2.add(theString);
+              } else if (data.substring(i, i + j + 1).contains(": Medium")) {
+                if (!list3.contains(theString)) list3.add(theString);
+              } else if (data.substring(i, i + j + 1).contains(": Bad")) {
+                if (!list4.contains(theString)) list4.add(theString);
               }
 
               break;
             }
           }
-
         }
-        j=0;
+        j = 0;
       }
     }
 

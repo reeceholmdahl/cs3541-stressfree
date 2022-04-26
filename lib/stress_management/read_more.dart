@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'techniques_data/technique.dart';
+import '../model/technique.dart';
 
 class ReadMore extends StatelessWidget {
   final Technique technique;
