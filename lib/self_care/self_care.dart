@@ -12,7 +12,6 @@ class SelfCare extends StatelessWidget {
     return Scaffold(
         appBar: AppBar(
           title: const Text('Self Care'),
-          backgroundColor: Color(0xff41544e),
         ),
         drawer: SideDrawer(),
         floatingActionButton: FloatingActionButton.extended(
@@ -22,7 +21,6 @@ class SelfCare extends StatelessWidget {
               MaterialPageRoute(builder: (context) => const FavoriteTips()),
             );
           },
-          backgroundColor: Color(0xff9f1818),
           icon: Icon(Icons.favorite),
           label: Text("Favorites"),
         ),

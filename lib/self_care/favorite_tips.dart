@@ -21,7 +21,6 @@ class FavoriteTips extends StatelessWidget {
               MaterialPageRoute(builder: (context) => const SelfCare()),
             );
           },
-          backgroundColor: Colors.grey,
           label: Text("All Ideas"),
           icon: Icon(Icons.arrow_back),
         ));

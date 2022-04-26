@@ -183,3 +183,11 @@ class PageCard extends StatelessWidget {
     );
   }
 }
+
+String makeDBDate() {
+  DateTime date = DateTime.now();
+  String year = date.year.toString();
+  String month = date.month.toString();
+  String day = date.day.toString();
+  return (day + "-" + month + "-" + year);
+}

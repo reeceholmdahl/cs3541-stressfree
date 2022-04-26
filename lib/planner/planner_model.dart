@@ -1,5 +1,6 @@
 import 'dart:developer';
 
+import 'package:firebase_database/firebase_database.dart';
 import 'package:firstapp/model/future_activity.dart';
 import 'package:flutter/foundation.dart';
 
@@ -18,6 +19,7 @@ class PlannerState {
 class _PlannerMediator {
   final notifier = BasicNotifier();
   final List<Activity> _activities = [];
+  final _db = FirebaseDatabase.instance.ref('Planner');
   PlannerState _state = const PlannerState(deleteMode: false);
   dynamic _sender;
 

@@ -119,9 +119,7 @@ class _InformaticsState extends State<Informatics> {
         drawer: SideDrawer(),
         appBar: AppBar(
           title: const Text('Informatics'),
-          backgroundColor: Color.fromRGBO(25, 32, 30, 1),
         ),
-        backgroundColor: Color.fromRGBO(201, 189, 182, 1),
         body: FutureBuilder(
             future: pullData(),
             builder: (context, AsyncSnapshot<String> snapshot) {

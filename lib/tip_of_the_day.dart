@@ -12,9 +12,7 @@ class TipOfTheDay extends StatelessWidget {
       home: Scaffold(
         appBar: AppBar(
           title: const Text("Tip of the Day"),
-          backgroundColor: Color.fromRGBO(25, 32, 30, 1),
         ),
-        backgroundColor: Color.fromRGBO(201, 189, 182, 1),
         resizeToAvoidBottomInset: false,
         drawer: SideDrawer(),
         body: TipBody(),

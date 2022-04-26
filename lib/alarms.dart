@@ -73,7 +73,6 @@ class AlarmsState extends State<Alarms> {
       drawer: SideDrawer(),
       appBar: AppBar(
         title: const Text('Alarm Page'),
-        backgroundColor: Color.fromRGBO(25, 32, 30, 1),
       ),
       body: Center(
         child: Column(
