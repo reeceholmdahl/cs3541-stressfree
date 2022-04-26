@@ -1,22 +1,17 @@
-
-import 'package:firstapp/journal/readableData/readable.dart';
-import 'package:firstapp/stressManagement/techniquesData/techniques.dart';
 import 'package:flutter/material.dart';
-import 'journal.dart';
-import 'package:firstapp/data/mood.dart';
-//
-//FOR TESTING OTHER SHIT
-//
+import 'readable_data/readable.dart';
 
-class pastJournal extends StatelessWidget {
+class PastJournal extends StatelessWidget {
   final Readable readable;
-  pastJournal({Key? key, required this.readable}) : super(key: key);
+
+  PastJournal({Key? key, required this.readable}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
     final topContentText = Column(
       crossAxisAlignment: CrossAxisAlignment.start,
-      children: <Widget>[
-        SizedBox(height: 120.0),
+      children: [
+        SizedBox(height: 60.0),
         Icon(
           readable.icon,
           color: Colors.white,
@@ -38,26 +33,12 @@ class pastJournal extends StatelessWidget {
       ],
     );
 
-    final topContent = Stack(
-      children: <Widget>[
-        Container(
-          padding: EdgeInsets.all(40.0),
-          decoration: BoxDecoration(color: readable.color),
-          child: Center(
-            child: topContentText,
-          ),
-        ),
-        Positioned(
-          left: 8.0,
-          top: 60.0,
-          child: InkWell(
-            onTap: () {
-              Navigator.pop(context);
-            },
-            child: Icon(Icons.arrow_back, color: Colors.white),
-          ),
-        )
-      ],
+    final topContent = Container(
+      padding: EdgeInsets.fromLTRB(40, 0, 40, 40),
+      decoration: BoxDecoration(color: readable.color),
+      child: Center(
+        child: topContentText,
+      ),
     );
 
     final bottomContentText = Text(
@@ -69,16 +50,16 @@ class pastJournal extends StatelessWidget {
       padding: EdgeInsets.all(40.0),
       child: Center(
         child: Column(
-          children: <Widget>[bottomContentText],
+          children: [bottomContentText],
         ),
       ),
     );
 
     return Scaffold(
+      appBar: AppBar(title: Text('Past Journal Entry')),
       body: Column(
-        children: <Widget>[topContent, bottomContent],
+        children: [topContent, bottomContent],
       ),
-      backgroundColor: Color.fromRGBO(201, 189, 182, 1),
       resizeToAvoidBottomInset: false,
     );
   }

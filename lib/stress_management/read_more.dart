@@ -1,15 +1,12 @@
-
-import 'package:firstapp/stressManagement/techniquesData/techniques.dart';
 import 'package:flutter/material.dart';
-import 'techniquesData/techniques.dart';
 
+import 'techniques_data/technique.dart';
 
-class readMore extends StatelessWidget {
+class ReadMore extends StatelessWidget {
   final Technique technique;
-  readMore({Key? key, required this.technique}) : super(key: key);
+  ReadMore({Key? key, required this.technique}) : super(key: key);
   @override
   Widget build(BuildContext context) {
-
     final topContentText = Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
@@ -39,7 +36,7 @@ class readMore extends StatelessWidget {
       children: <Widget>[
         Container(
           padding: EdgeInsets.all(40.0),
-          decoration: BoxDecoration(color: Color.fromRGBO(157,	180,	165, 10)),
+          decoration: BoxDecoration(color: Color.fromRGBO(157, 180, 165, 10)),
           child: Center(
             child: topContentText,
           ),

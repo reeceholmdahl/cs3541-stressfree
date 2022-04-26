@@ -1,4 +1,4 @@
-import 'Idea.dart';
+import 'idea.dart';
 
 class TipLists {
   static List<Idea> ideas = [
@@ -35,5 +35,4 @@ class TipLists {
   ];
 
   static List<Idea> favIdeas = [];
-
 }

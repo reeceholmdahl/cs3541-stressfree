@@ -1,30 +1,18 @@
-import 'package:flutter/cupertino.dart';
-
 import 'dart:core';
 import 'package:flutter_alarm_clock/flutter_alarm_clock.dart';
 import 'package:numberpicker/numberpicker.dart';
 import 'package:flutter/material.dart';
 
-import '../drawer.dart';
+import '../side_drawer.dart';
 
-class Alarms extends StatelessWidget {
+class Alarms extends StatefulWidget {
   const Alarms({Key? key}) : super(key: key);
 
   @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Alarms',
-      home: Test(),
-    );
-  }
+  AlarmsState createState() => AlarmsState();
 }
 
-class Test extends StatefulWidget {
-  @override
-  TestState createState() => TestState();
-}
-
-class TestState extends State<Test> {
+class AlarmsState extends State<Alarms> {
   //List<bool> isSelected = [true, false];
 
   int _currentValue = 1;
@@ -82,7 +70,7 @@ class TestState extends State<Test> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      drawer: sideDrawerLeft(),
+      drawer: SideDrawer(),
       appBar: AppBar(
         title: const Text('Alarm Page'),
       ),
@@ -98,17 +86,16 @@ class TestState extends State<Test> {
 
             new Align(
                 alignment: Alignment.bottomCenter,
-
-                child:
-              IconButton(
-                icon: const Icon(Icons.add_circle_rounded),
-                color: Colors.lightBlue,
-                iconSize: 60,
-                onPressed: () {
-                  buildNewAlarmPopup(context);
-                },
-              )
-            )
+                child: IconButton(
+                  icon: const Icon(Icons.add_circle_rounded),
+                  color: Theme.of(context)
+                      .floatingActionButtonTheme
+                      .backgroundColor,
+                  iconSize: 60,
+                  onPressed: () {
+                    buildNewAlarmPopup(context);
+                  },
+                ))
             //SavedAlarms(), //shows the saved alarms
           ],
         ),
@@ -282,7 +269,6 @@ class AlarmIcon extends StatelessWidget {
           icon: const Icon(Icons.access_alarms),
           color: Colors.pink,
           iconSize: 100.0,
-
           onPressed: () {
             FlutterAlarmClock.showAlarms();
           },

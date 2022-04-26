@@ -1,44 +1,44 @@
-import 'package:firstapp/drawer.dart';
-import 'package:firstapp/journal/pastJournal.dart';
-import 'package:firstapp/journal/readableData/readableList.dart';
-import 'package:flutter/cupertino.dart';
+import 'dart:developer';
+
+import 'package:firstapp/constants.dart';
+import 'package:firstapp/mood_rater.dart';
+import 'package:firstapp/side_drawer.dart';
 import 'package:flutter/material.dart';
-import 'package:firstapp/data/mood.dart';
 
-import 'historyView.dart';
+import 'history_view.dart';
+import 'readable_data/readable_list.dart';
 
-class journal extends StatelessWidget {
-  const journal({Key? key}) : super(key: key);
+class DailyJournal extends StatelessWidget {
+  const DailyJournal({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    const appTitle = 'Self Care Journal';
-    return MaterialApp(
-      title: appTitle,
-      home: Scaffold(
-        appBar: AppBar(
-          title: const Text(appTitle),
-          backgroundColor: Color.fromRGBO(25, 32, 30, 1),
-        ),
-        backgroundColor: Color.fromRGBO(201, 189, 182, 1),
-        resizeToAvoidBottomInset: false,
-        drawer: sideDrawerLeft(),
-        body: journalArea(),
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Self Care Journal'),
       ),
+      resizeToAvoidBottomInset: false,
+      drawer: SideDrawer(),
+      body: JournalArea(),
     );
   }
 }
 
-class journalArea extends StatelessWidget {
-  var _mood = Mood.nullMood;
+class JournalArea extends StatelessWidget {
+  var _mood = Moods.Null;
   final titleController = TextEditingController();
   final controller = TextEditingController();
-  var moodColor = Color.fromRGBO(201, 189, 182, 1);
-  var moodIcon = Icons.visibility_off_sharp;
-  journalArea({Key? key}) : super(key: key);
+  // var moodColor = Color.fromRGBO(201, 189, 182, 1);
+  // var moodIcon = Icons.visibility_off_sharp;
+  JournalArea({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    late final MoodRater moodRater;
+    moodRater = MoodRater(onChanged: () {
+      _mood = moodRater.selectedMood();
+      log(_mood.name);
+    });
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
@@ -55,68 +55,9 @@ class journalArea extends StatelessWidget {
         ),
         Padding(
           padding: EdgeInsets.symmetric(horizontal: 15, vertical: 5),
-            child: Center(
-              child: Row(
-                children: <Widget>[
-                  OutlineButton(
-                    shape: CircleBorder(),
-                    highlightColor: Colors.red,
-                    highlightedBorderColor: Colors.red,
-                    borderSide: BorderSide(
-                        width: 3,
-                        color: Colors.red
-                    ),
-                    child: Icon(Mood.icon_bad),
-                    onPressed: () {
-                      moodColor = Colors.red;
-                      moodIcon = Mood.icon_bad;
-                    },
-                  ),
-                  OutlineButton(
-                    shape: CircleBorder(),
-                    highlightColor: Colors.amber,
-                    highlightedBorderColor: Colors.amber,
-                    borderSide: BorderSide(
-                        width: 3,
-                        color: Colors.amber
-                    ),
-                    child: Icon(Mood.icon_medium),
-                    onPressed: () {
-                      moodColor = Colors.amber;
-                      moodIcon = Mood.icon_medium;
-                    }
-                  ),
-                  OutlineButton(
-                    shape: CircleBorder(),
-                    highlightColor: Colors.lime,
-                    highlightedBorderColor: Colors.lime,
-                    borderSide: BorderSide(
-                        width: 3,
-                        color: Colors.lime
-                    ),
-                    child: Icon(Mood.icon_good),
-                    onPressed: () {
-                      moodColor = Colors.lime;
-                      moodIcon = Mood.icon_good;
-                    },
-                  ),
-                  OutlineButton(
-                    shape: CircleBorder(),
-                    highlightColor: Colors.green,
-                    highlightedBorderColor: Colors.green,
-                    borderSide: BorderSide(
-                        width: 3,
-                        color: Colors.green
-                    ),
-                    child: Icon(Mood.icon_great),
-                    onPressed: () {
-                      moodColor = Colors.green;
-                      moodIcon = Mood.icon_great;
-                    },
-                  ),
-                ],
-              ),
-            ),
+          child: Center(
+            child: moodRater,
+          ),
         ),
         Card(
             color: Colors.grey,
@@ -131,8 +72,7 @@ class journalArea extends StatelessWidget {
                   filled: true,
                 ),
               ),
-            )
-        ),
+            )),
         Card(
             color: Colors.grey,
             child: Padding(
@@ -141,60 +81,57 @@ class journalArea extends StatelessWidget {
                 controller: controller,
                 maxLines: 17,
                 decoration: InputDecoration.collapsed(
-                    hintText: "Write about your day here!",
-                    fillColor: Color.fromRGBO(157, 180, 165, 100),
-                    filled: true,
+                  hintText: "Write about your day here!",
+                  fillColor: Color.fromRGBO(157, 180, 165, 100),
+                  filled: true,
                 ),
               ),
-            )
-        ),
+            )),
         Padding(
-          padding: EdgeInsets.symmetric(horizontal: 14, vertical: 16),
+          padding: EdgeInsets.symmetric(horizontal: 16, vertical: 16),
           child: Center(
-            child: Row(
-              children: <Widget>[
-                ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    primary: Color.fromRGBO(157,	180,	165, 100),
-                    fixedSize: const Size(180, 60),
-                  ),
-                  child: Text(
-                    'Save',
-                    style: const TextStyle(
-                      fontSize: 25,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                  onPressed: () {
-
-                    inputReadable(moodIcon, moodColor, controller.text, titleController.text);
-                    
-                    //For origional  pastJournals(controllerText: controller, color: moodColor, icon: moodIcon);
-                  },
+            child: Row(children: <Widget>[
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  primary: Color.fromRGBO(157, 180, 165, 100),
+                  fixedSize: const Size(180, 60),
                 ),
-                ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    primary: Color.fromRGBO(157, 180, 165, 100),
-                    fixedSize: const Size(180, 60),
+                child: Text(
+                  'Save',
+                  style: const TextStyle(
+                    fontSize: 25,
+                    fontWeight: FontWeight.w600,
                   ),
-                  child: Text(
-                    'View Submissions',
-                    style: const TextStyle(
-                      fontSize: 15,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                  onPressed: () {
-                    Navigator.push<void>(context,
-                        MaterialPageRoute(builder: (context) =>  historyView()));
-
-                    // For Origional
-                    //Navigator.push<void>(context,
-                    //    MaterialPageRoute(builder: (context) =>  pastJournals(controllerText: controller, color: moodColor, icon: moodIcon)));
-                  },
                 ),
-              ]
-            ),
+                onPressed: () {
+                  inputReadable(_mood.iconData, _mood.color, controller.text,
+                      titleController.text);
+
+                  //For origional  pastJournals(controllerText: controller, color: moodColor, icon: moodIcon);
+                },
+              ),
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  primary: Color.fromRGBO(157, 180, 165, 100),
+                  fixedSize: const Size(180, 60),
+                ),
+                child: Text(
+                  'View Submissions',
+                  style: const TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                onPressed: () {
+                  Navigator.push<void>(context,
+                      MaterialPageRoute(builder: (context) => HistoryView()));
+
+                  // For Origional
+                  //Navigator.push<void>(context,
+                  //    MaterialPageRoute(builder: (context) =>  pastJournals(controllerText: controller, color: moodColor, icon: moodIcon)));
+                },
+              ),
+            ]),
           ),
         ),
       ],

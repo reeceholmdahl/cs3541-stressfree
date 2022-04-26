@@ -1,50 +1,44 @@
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 import 'dart:developer';
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 
-import 'drawer.dart';
+import 'side_drawer.dart';
 import 'video_list.dart';
 
-void main() {
-  WidgetsFlutterBinding.ensureInitialized();
-  SystemChrome.setSystemUIOverlayStyle(
-    const SystemUiOverlayStyle(
-      statusBarColor: Colors.blueAccent,
-    ),
-  );
-  runApp(youtubeStressPage());
-}
-
-
-class youtubeStressPage extends StatelessWidget {
-  const youtubeStressPage({Key? key}) : super(key: key);
+class YoutubeStressPage extends StatelessWidget {
+  const YoutubeStressPage({Key? key}) : super(key: key);
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: 'Stress Management Techniques',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-        appBarTheme: const AppBarTheme(
-          color: Colors.deepPurpleAccent,
-          textTheme: TextTheme(
-            headline6: TextStyle(
-              color: Colors.white,
-              fontWeight: FontWeight.w300,
-              fontSize: 20.0,
+    return Scaffold(
+        drawer: SideDrawer(),
+        resizeToAvoidBottomInset: false,
+        appBar: AppBar(
+          leading: Padding(
+            padding: const EdgeInsets.only(left: 12.0),
+            child: Image.asset(
+              'assets/ypf.png',
+              fit: BoxFit.fitWidth,
             ),
           ),
+          title: const Text(
+            'Stress Management Techniques',
+            style: TextStyle(color: Colors.white),
+          ),
+          actions: [
+            IconButton(
+              icon: const Icon(Icons.video_library),
+              onPressed: () => Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => VideoList(),
+                ),
+              ),
+            ),
+          ],
         ),
-        iconTheme: const IconThemeData(
-          color: Colors.deepPurpleAccent,
-        ),
-      ),
-      home: MyHomePage(),
-    );
+        body: MyHomePage());
   }
 }
 
@@ -65,11 +59,7 @@ class _MyHomePageState extends State<MyHomePage> {
   bool _muted = false;
   bool _isPlayerReady = false;
 
-  final List<String> _ids = [
-    'i-pazYyLSWQ',
-    'inpok4MKVLM',
-    'ZToicYcHIOU'
-  ];
+  final List<String> _ids = ['i-pazYyLSWQ', 'inpok4MKVLM', 'ZToicYcHIOU'];
 
   @override
   void initState() {
@@ -160,49 +150,22 @@ class _MyHomePageState extends State<MyHomePage> {
           _showSnackBar('Next Video Started!');
         },
       ),
-      builder: (context, player) => Scaffold(
-        drawer: sideDrawerLeft(),
-        appBar: AppBar(
-          leading: Padding(
-            padding: const EdgeInsets.only(left: 12.0),
-            child: Image.asset(
-              'assets/ypf.png',
-              fit: BoxFit.fitWidth,
+      builder: (context, player) => ListView(
+        children: [
+          player,
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                _space,
+                _text('Title', _videoMetaData.title),
+                _space,
+                _text('Channel', _videoMetaData.author),
+              ],
             ),
           ),
-          title: const Text(
-            'Stress Management Techniques',
-            style: TextStyle(color: Colors.white),
-          ),
-          actions: [
-            IconButton(
-              icon: const Icon(Icons.video_library),
-              onPressed: () => Navigator.push(
-                context,
-                CupertinoPageRoute(
-                  builder: (context) => VideoList(),
-                ),
-              ),
-            ),
-          ],
-        ),
-        body: ListView(
-          children: [
-            player,
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  _space,
-                  _text('Title', _videoMetaData.title),
-                  _space,
-                  _text('Channel', _videoMetaData.author),
-                ],
-              ),
-            ),
-          ],
-        ),
+        ],
       ),
     );
   }
@@ -250,8 +213,6 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Widget get _space => const SizedBox(height: 10);
-
-
 
   void _showSnackBar(String message) {
     ScaffoldMessenger.of(context).showSnackBar(

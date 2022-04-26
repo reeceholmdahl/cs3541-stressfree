@@ -1,8 +1,7 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 
-import 'drawer.dart';
+import 'side_drawer.dart';
 
 /// Creates list of video players
 class VideoList extends StatefulWidget {
@@ -11,20 +10,17 @@ class VideoList extends StatefulWidget {
 }
 
 class _VideoListState extends State<VideoList> {
-  final List<YoutubePlayerController> _controllers = [
-    'i-pazYyLSWQ',
-    'inpok4MKVLM',
-    'ZToicYcHIOU'
-  ]
-      .map<YoutubePlayerController>(
-        (videoId) => YoutubePlayerController(
-      initialVideoId: videoId,
-      flags: const YoutubePlayerFlags(
-        autoPlay: false,
-      ),
-    ),
-  )
-      .toList();
+  final List<YoutubePlayerController> _controllers =
+      ['i-pazYyLSWQ', 'inpok4MKVLM', 'ZToicYcHIOU']
+          .map<YoutubePlayerController>(
+            (videoId) => YoutubePlayerController(
+              initialVideoId: videoId,
+              flags: const YoutubePlayerFlags(
+                autoPlay: false,
+              ),
+            ),
+          )
+          .toList();
 
   @override
   Widget build(BuildContext context) {
@@ -32,7 +28,7 @@ class _VideoListState extends State<VideoList> {
       appBar: AppBar(
         title: const Text('Stress Management Technique List'),
       ),
-      drawer: sideDrawerLeft(),
+      drawer: SideDrawer(),
       body: ListView.separated(
         itemBuilder: (context, index) {
           return YoutubePlayer(

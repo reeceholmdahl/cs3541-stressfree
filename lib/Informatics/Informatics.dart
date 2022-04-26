@@ -7,46 +7,26 @@ import 'package:path_provider/path_provider.dart';
 
 import 'package:pie_chart/pie_chart.dart';
 
-import '../drawer.dart';
-
-class Informatics extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: 'Pie Chart Demo',
-      theme: ThemeData(
-        primarySwatch: Colors.blueGrey,
-      ),
-      darkTheme: ThemeData(
-        primarySwatch: Colors.blueGrey,
-        brightness: Brightness.dark,
-      ),
-      home: HomePage(storage: CounterStorage()),
-    );
-  }
-}
+import '../side_drawer.dart';
 
 enum LegendShape { Circle, Rectangle }
 
-class HomePage extends StatefulWidget {
-  const HomePage({Key? key, required this.storage}) : super(key: key);
-
-  final CounterStorage storage;
+class Informatics extends StatefulWidget {
+  const Informatics({Key? key}) : super(key: key);
 
   @override
-  _HomePageState createState() => _HomePageState();
+  _InformaticsState createState() => _InformaticsState();
 }
 
-class _HomePageState extends State<HomePage> {
+class _InformaticsState extends State<Informatics> {
+  late final CounterStorage counterStorage;
+
   final dataMap = <String, double>{
     "Happy": 5,
     "Mildly Happy": 3,
     "Mildly Sad": 2,
     "Sad": 2,
   };
-
-
 
   final colorList = <Color>[
     Color(0xfffdcb6e),
@@ -77,6 +57,8 @@ class _HomePageState extends State<HomePage> {
 
   int key = 0;
 
+  String myString = "";
+
   buildNewPopup(BuildContext context, String title, List<String> activityList) {
     return showDialog(
         context: context,
@@ -86,7 +68,9 @@ class _HomePageState extends State<HomePage> {
             content: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Text("When you were " + title + " you did ",),
+                Text(
+                  "When you were " + title + " you did ",
+                ),
                 Container(
                     height: 200,
                     width: 200,
@@ -103,22 +87,22 @@ class _HomePageState extends State<HomePage> {
   }
 
   @override
+  void initState() {
+    super.initState();
+    counterStorage = CounterStorage();
+    super.initState();
+    counterStorage.readCounter().then((String value) {
+      setState(() {
+        myString = value;
+      });
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     final List<String> entries = <String>['A', 'B', 'C'];
     final List<int> colorCodes = <int>[600, 500, 100];
     final List<String> activityList = <String>['A', 'B', 'C'];
-
-    String myString = "";
-
-    @override
-    void initState() {
-      super.initState();
-      widget.storage.readCounter().then((String value) {
-        setState(() {
-          myString = value;
-        });
-      });
-    }
 
     //do action, maybe not needed for this application
 
@@ -128,7 +112,7 @@ class _HomePageState extends State<HomePage> {
       });
 
       // Write the variable as a string to the file.
-      return widget.storage.writeCounter(myString);
+      return counterStorage.writeCounter(myString);
     }
 
     //final dataMap = readDataFromFile();
@@ -156,7 +140,7 @@ class _HomePageState extends State<HomePage> {
     );
 
     return Scaffold(
-        drawer: sideDrawerLeft(),
+        drawer: SideDrawer(),
         appBar: AppBar(
           title: const Text('Sample Code'),
         ),

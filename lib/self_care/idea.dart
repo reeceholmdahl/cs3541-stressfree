@@ -1,14 +1,12 @@
 import 'package:flutter/material.dart';
 
 class Idea {
-
   late String what;
   late int type;
   late bool isFavorited;
   late Color iconColor;
   late Color? backgroundColor;
   late IconData? icon;
-
 
   Idea(String what, int type) {
     this.what = what;
@@ -26,7 +24,7 @@ class Idea {
   }
 
   void assignAvatarProperties() {
-    switch(type) {
+    switch (type) {
       case 1:
         iconColor = Colors.red;
         backgroundColor = Colors.red[100];
@@ -64,5 +62,4 @@ class Idea {
         break;
     }
   }
-
 }
