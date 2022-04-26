@@ -1,5 +1,6 @@
 import 'package:firstapp/Alarms/alarm.dart';
 import 'package:firstapp/Informatics/Informatics.dart';
+import 'package:firstapp/music/music.dart';
 import 'package:flutter/cupertino.dart';
 
 import '../main.dart';
@@ -25,7 +26,7 @@ class clickDirector extends StatelessWidget {
     } else if (this.id == 3) {
       return Alarms();
     } else if(this.id == 4) {
-      throw UnimplementedError();
+      return musicPlayer();
     } else {
       throw UnimplementedError();
     }
