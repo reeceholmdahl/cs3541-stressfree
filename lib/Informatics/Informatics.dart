@@ -40,10 +40,10 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   final dataMap = <String, double>{
-    "Happy": 5,
-    "Mildly Happy": 3,
-    "Mildly Sad": 2,
-    "Sad": 2,
+    "Great": 5,
+    "Good": 3,
+    "Medium": 2,
+    "Bad": 2,
   };
 
   Future<String> pullData() async {
@@ -71,10 +71,10 @@ class _HomePageState extends State<HomePage> {
   }
 
   final colorList = <Color>[
-    (Mood.moods["bad"]!.color),
-    Mood.moods["medium"]!.color,
+    (Mood.moods["great"]!.color),
     Mood.moods["good"]!.color,
-    Mood.moods["great"]!.color,
+    Mood.moods["medium"]!.color,
+    Mood.moods["bad"]!.color,
   ];
 
   ChartType? _chartType = ChartType.disc;
@@ -109,7 +109,7 @@ class _HomePageState extends State<HomePage> {
                 //mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
-                    "When you were " + title + " you did ",
+                    "When you felt " + title + " you did ",
                   ),
                   Container(
                       height: 200,
@@ -142,7 +142,7 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
         drawer: sideDrawerLeft(),
         appBar: AppBar(
-          title: const Text('Sample Code'),
+          title: const Text('Informatics'),
         ),
         body: FutureBuilder(
             future: pullData(),
@@ -188,7 +188,7 @@ class _HomePageState extends State<HomePage> {
                               style: ButtonStyle(
                                 foregroundColor:
                                 MaterialStateProperty.all<Color>(
-                                    Colors.blue),
+                                    colorList.elementAt(index)),
                               ),
                               onPressed: () {
                                 for (int i = 0; i < dataMap.length; ++i) {
@@ -196,7 +196,7 @@ class _HomePageState extends State<HomePage> {
                                     print(index);
                                     buildNewPopup(
                                         context,
-                                        "2", //fix this
+                                        dataMap.keys.elementAt(index), //fix this
                                         generateMoodActivityLists(snapshot.toString())
                                             .elementAt(i)); //very inefficient
                                   }
@@ -281,15 +281,18 @@ class _HomePageState extends State<HomePage> {
 
 
               if(data.substring(i, i+j+1).contains(": Great")) {
-                list1.add(theString);
+                if(!list1.contains(theString))
+                  list1.add(theString);
               } else if(data.substring(i,  i+j+1).contains(": Good")) {
-                list2.add(theString);
+                if(!list2.contains(theString))
+                  list2.add(theString);
               } else if(data.substring(i,  i+j+1).contains(": Medium")) {
-                list3.add(theString);
+                if(!list3.contains(theString))
+                  list3.add(theString);
               }
               else if(data.substring(i,  i+j+1).contains(": Bad")) {
-
-                list4.add(theString);
+                if(!list4.contains(theString))
+                  list4.add(theString);
               }
 
               break;
