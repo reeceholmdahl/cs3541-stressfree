@@ -70,9 +70,15 @@ class AlarmsState extends State<Alarms> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+<<<<<<< HEAD:lib/alarm/alarms.dart
       drawer: SideDrawer(),
+=======
+      drawer: sideDrawerLeft(),
+      backgroundColor: Color.fromRGBO(201, 189, 182, 1),
+>>>>>>> a329cbfe442af7339bc3043d43bc26833701a4bf:lib/Alarms/alarm.dart
       appBar: AppBar(
         title: const Text('Alarm Page'),
+        backgroundColor: Color.fromRGBO(25, 32, 30, 1),
       ),
       body: Center(
         child: Column(
@@ -86,6 +92,7 @@ class AlarmsState extends State<Alarms> {
 
             new Align(
                 alignment: Alignment.bottomCenter,
+<<<<<<< HEAD:lib/alarm/alarms.dart
                 child: IconButton(
                   icon: const Icon(Icons.add_circle_rounded),
                   color: Theme.of(context)
@@ -96,6 +103,19 @@ class AlarmsState extends State<Alarms> {
                     buildNewAlarmPopup(context);
                   },
                 ))
+=======
+
+                child:
+              IconButton(
+                icon: const Icon(Icons.add_circle_rounded),
+                color: Colors.lightBlue,
+                iconSize: 100,
+                onPressed: () {
+                  buildNewAlarmPopup(context);
+                },
+              )
+            )
+>>>>>>> a329cbfe442af7339bc3043d43bc26833701a4bf:lib/Alarms/alarm.dart
             //SavedAlarms(), //shows the saved alarms
           ],
         ),
@@ -268,7 +288,12 @@ class AlarmIcon extends StatelessWidget {
         IconButton(
           icon: const Icon(Icons.access_alarms),
           color: Colors.pink,
+<<<<<<< HEAD:lib/alarm/alarms.dart
           iconSize: 100.0,
+=======
+          iconSize: 200.0,
+
+>>>>>>> a329cbfe442af7339bc3043d43bc26833701a4bf:lib/Alarms/alarm.dart
           onPressed: () {
             FlutterAlarmClock.showAlarms();
           },

@@ -31,7 +31,7 @@ class TipLists {
     Idea("Organize your files", 5),
     Idea("Turn off your phone", 1),
     Idea("Play a game", 3),
-    Idea("Dance", 2)
+    Idea("Dance", 2),
   ];
 
   static List<Idea> favIdeas = [];

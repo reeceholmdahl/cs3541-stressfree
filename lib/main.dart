@@ -5,6 +5,7 @@ import 'package:firstapp/side_drawer.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+<<<<<<< HEAD
 import 'alarm/alarms.dart';
 import 'Informatics/informatics.dart';
 import 'planner/planner.dart';
@@ -40,6 +41,17 @@ ThemeData makeTheme(BuildContext context) {
           appBarTheme: AppBarTheme(
             backgroundColor: Color(0xFF41544E),
           ));
+=======
+import 'Informatics/Informatics.dart';
+import 'home/home.dart';
+import 'Alarms/alarm.dart';
+import 'testBed.dart';
+
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
+  runApp(homePage());
+>>>>>>> a329cbfe442af7339bc3043d43bc26833701a4bf
 }
 
 class Home extends StatelessWidget {
@@ -64,6 +76,7 @@ class Home extends StatelessWidget {
                 color: Theme.of(context).canvasColor,
                 onPressed: () {},
               ),
+<<<<<<< HEAD
               PageCard(
                 name: 'Planner',
                 color: Theme.of(context).canvasColor,
@@ -108,10 +121,47 @@ class Home extends StatelessWidget {
           );
         }),
       ),
+=======
+              body: Center(
+                child: Column(
+                  children: <Widget>[
+                    Padding(
+                      padding: EdgeInsets.only(top: 20.0, bottom: 20.0),
+                      child: Text("StressFree!",style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.green), textScaleFactor: 4,)
+                      ,),
+                    ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                          primary: Colors.green
+                      ),
+                      child: Text('TestBed'),
+                      onPressed: () {
+                        Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) {
+                          return TestPage();
+                        }));
+                      },
+                    ),
+                    ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                          primary: Colors.red
+                      ),
+                      child: Text('Home'),
+                      onPressed: () {
+                        Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) {
+                          return homePage();
+                        }));
+                      },
+                    ),
+                  ],
+                )
+              ),
+            )
+        )
+>>>>>>> a329cbfe442af7339bc3043d43bc26833701a4bf
     );
   }
 }
 
+<<<<<<< HEAD
 /*
 Used for creation of each tile
 */
@@ -175,3 +225,5 @@ class PageCard extends StatelessWidget {
     );
   }
 }
+=======
+>>>>>>> a329cbfe442af7339bc3043d43bc26833701a4bf

@@ -3,8 +3,18 @@ import 'dart:developer';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 
+<<<<<<< HEAD
 import 'package:firstapp/side_drawer.dart';
 import 'package:firstapp/constants.dart';
+=======
+import 'package:firebase_database/firebase_database.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_database/ui/firebase_animated_list.dart';
+import 'dart:convert';
+
+class Planner extends StatelessWidget {
+  const Planner({Key? key}) : super(key: key);
+>>>>>>> a329cbfe442af7339bc3043d43bc26833701a4bf
 
 import 'package:firstapp/model/activity.dart';
 import 'package:firstapp/model/activity_category.dart';
@@ -123,6 +133,7 @@ class _AddActivityDialogState<T extends Activity>
               : true)) &&
       (T == FutureActivity ? recurrencePicker!.recurrence != null : true);
 
+<<<<<<< HEAD
   void _addActivity() {
     var plannedActivity = PlannedActivity(activityName, activityCategory);
     Activity activity = PresetActivities.Null;
@@ -293,6 +304,12 @@ class _AddActivityDialogState<T extends Activity>
       ),
     );
   }
+=======
+  final  databaseRef = FirebaseDatabase.instance.ref('Planner');
+
+  DailyActivity _activity = DailyActivity.nullActivity;
+  Mood _mood = Mood.nullMood;
+>>>>>>> a329cbfe442af7339bc3043d43bc26833701a4bf
 
   @override
   void dispose() {
@@ -304,6 +321,19 @@ class _AddActivityDialogState<T extends Activity>
 class ActivityListView extends StatelessWidget {
   ActivityListView();
 
+  void pushActivity(String activity, String category, String mood) {
+    final String date = getDate();
+    databaseRef.child("/$date/Mood").push().set({"Mood": mood, "Activity": activity, "Category": category});
+  }
+
+  String getDate()
+  {
+    DateTime date = DateTime.now();
+    String year = date.year.toString();
+    String month = date.month.toString();
+    String day = date.day.toString();
+    return(day + "-" + month + "-" + year);
+  }
   @override
   Widget build(BuildContext context) {
     final activities = PlannerMediator.activities;
@@ -436,6 +466,7 @@ class ActivityListItem extends StatelessWidget {
                             activity: activity,
                             index: index,
                           ),
+<<<<<<< HEAD
                         );
                       },
                     )
@@ -464,6 +495,83 @@ class ActivityListItemActionIcon extends StatelessWidget {
 
   void _onLongPress() {
     PlannerStateChanger(PlannerState(deleteMode: true));
+=======
+                          ElevatedButton(
+                              onPressed: () {
+                                if (_formKey.currentState!.validate()) {
+                                  logActivity();
+                                  pushActivity(_activity.name, _activity.category.name, _mood.name);
+                                  showDialog<String>(
+                                      context: context,
+                                      builder: (BuildContext context) => AlertDialog(
+                                        content: const Text('Activity Saved!'),
+                                        actions: <Widget>[
+                                          TextButton(
+                                            onPressed: () => Navigator.pop(context, 'OK'),
+                                            child: const Text('OK'),
+                                          ),
+                                        ],
+
+                                      )
+                                  );
+                                }
+                              },
+                              child: Text('Add activity'))
+                        ],
+                      ))),
+              Spacer(flex: 1),
+              Expanded(
+                  flex: 4,
+                  child: Column(
+                    children: [
+                      Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: Category.categories.entries.map((entry) {
+                            final c = entry.value;
+                            return ElevatedButton(
+                                onPressed: () {
+                                  setState(() {
+                                    _activity =
+                                        DailyActivity(_activity.name, c);
+                                  });
+                                },
+                                style: ElevatedButton.styleFrom(
+                                    primary: c.color, onPrimary: Colors.white),
+                                child: Text(c.name,
+                                    style: TextStyle(fontSize: 14),
+                                    textAlign: TextAlign.center));
+                          }).toList()),
+                      Column(
+                          children: Mood.moods.entries.map((entry) {
+                        final m = entry.value;
+                        return Card(
+                            color: _mood == m
+                                ? m.color.shade700
+                                : m.color.shade400,
+                            child: InkWell(
+                                splashColor: m.color.shade50.withAlpha(30),
+                                onTap: () {
+                                  setState(() {
+                                    _mood = m;
+                                  });
+                                },
+                                child: SizedBox(
+                                  width: 50,
+                                  height: 50,
+                                  child: Column(
+                                    children: [
+                                      const Icon(Icons.android_outlined,
+                                          size: 20),
+                                      Text(m.name,
+                                          style: TextStyle(fontSize: 12))
+                                    ],
+                                  ),
+                                )));
+                      }).toList())
+                    ],
+                  ))
+            ]));
+>>>>>>> a329cbfe442af7339bc3043d43bc26833701a4bf
   }
 
   void _onDelete() {

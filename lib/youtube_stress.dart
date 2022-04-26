@@ -123,7 +123,7 @@ class _MyHomePageState extends State<MyHomePage> {
             child: Text(
               _controller.metadata.title,
               style: const TextStyle(
-                color: Colors.white,
+                color: Colors.black,
                 fontSize: 18.0,
               ),
               overflow: TextOverflow.ellipsis,
@@ -150,6 +150,7 @@ class _MyHomePageState extends State<MyHomePage> {
           _showSnackBar('Next Video Started!');
         },
       ),
+<<<<<<< HEAD:lib/youtube_stress.dart
       builder: (context, player) => ListView(
         children: [
           player,
@@ -166,6 +167,49 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
           ),
         ],
+=======
+      builder: (context, player) => Scaffold(
+        drawer: sideDrawerLeft(),
+        appBar: AppBar(
+          backgroundColor: Color.fromRGBO(25, 32, 30, 1),
+          leading: Padding(
+            padding: const EdgeInsets.only(left: 12.0),
+          ),
+          title: const Text(
+            'Stress Management Techniques',
+            style: TextStyle(color: Colors.white),
+          ),
+          actions: [
+            IconButton(
+              icon: const Icon(Icons.video_library),
+              onPressed: () => Navigator.push(
+                context,
+                CupertinoPageRoute(
+                  builder: (context) => VideoList(),
+                ),
+              ),
+            ),
+          ],
+        ),
+        backgroundColor: Color.fromRGBO(201, 189, 182, 1),
+        body: ListView(
+          children: [
+            player,
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  _space,
+                  _text('Title', _videoMetaData.title),
+                  _space,
+                  _text('Channel', _videoMetaData.author),
+                ],
+              ),
+            ),
+          ],
+        ),
+>>>>>>> a329cbfe442af7339bc3043d43bc26833701a4bf:lib/youtubeStress.dart
       ),
     );
   }
@@ -175,14 +219,14 @@ class _MyHomePageState extends State<MyHomePage> {
       text: TextSpan(
         text: '$title : ',
         style: const TextStyle(
-          color: Colors.blueAccent,
+          color: Colors.black,
           fontWeight: FontWeight.bold,
         ),
         children: [
           TextSpan(
             text: value,
             style: const TextStyle(
-              color: Colors.blueAccent,
+              color: Colors.black,
               fontWeight: FontWeight.w300,
             ),
           ),

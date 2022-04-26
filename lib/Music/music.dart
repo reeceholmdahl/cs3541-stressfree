@@ -4,14 +4,28 @@ import 'package:flutter/services.dart';
 import 'package:just_audio/just_audio.dart';
 import './common.dart';
 import 'package:rxdart/rxdart.dart';
+import 'package:flutter/foundation.dart';
+import '../drawer.dart';
 
+<<<<<<< HEAD
 class SoothingMusic extends StatefulWidget {
+=======
+
+
+void main() => runApp(musicPlayer());
+
+class musicPlayer extends StatefulWidget {
+>>>>>>> a329cbfe442af7339bc3043d43bc26833701a4bf
   @override
   _SoothingMusicState createState() => _SoothingMusicState();
 }
 
+<<<<<<< HEAD
 class _SoothingMusicState extends State<SoothingMusic>
     with WidgetsBindingObserver {
+=======
+class _MyAppState extends State<musicPlayer> with WidgetsBindingObserver {
+>>>>>>> a329cbfe442af7339bc3043d43bc26833701a4bf
   final _player = AudioPlayer();
 
   @override
@@ -36,8 +50,28 @@ class _SoothingMusicState extends State<SoothingMusic>
     });
     // Try to load audio from a source and catch any errors.
     try {
-      await _player.setAudioSource(AudioSource.uri(Uri.parse(
-          "https://s3.amazonaws.com/scifri-episodes/scifri20181123-episode.mp3")));
+      await _player.setAudioSource(
+        ConcatenatingAudioSource(
+          // Start loading next item just before reaching it.
+          useLazyPreparation: true, // default
+          // Customise the shuffle algorithm.
+          shuffleOrder: DefaultShuffleOrder(), // default
+          // Specify the items in the playlist.
+          children: [
+            //These can be streams or (ideally) locally hosted
+            AudioSource.uri(Uri.parse("https://s3.amazonaws.com/scifri-episodes/scifri20181123-episode.mp3")),
+            AudioSource.uri(Uri.parse("https://s3.amazonaws.com/scifri-episodes/scifri20181123-episode.mp3")),
+          ],
+        ),
+        // Playback will be prepared to start from track1.mp3
+        initialIndex: 0, // default
+        // Playback will be prepared to start from position zero.
+        initialPosition: Duration.zero, // default
+      );
+      await _player.seekToNext();
+      await _player.seekToPrevious();
+// Jump to the beginning of track3.mp3.
+      await _player.seek(Duration(milliseconds: 0), index: 2);
     } catch (e) {
       print("Error loading audio source: $e");
     }
@@ -74,6 +108,7 @@ class _SoothingMusicState extends State<SoothingMusic>
 
   @override
   Widget build(BuildContext context) {
+<<<<<<< HEAD
     return Scaffold(
       body: SafeArea(
         child: Column(
@@ -98,6 +133,41 @@ class _SoothingMusicState extends State<SoothingMusic>
               },
             ),
           ],
+=======
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      home: Scaffold(
+        appBar: AppBar(
+          backgroundColor: Color.fromRGBO(25, 32, 30, 1),
+          title: const Text('Soothing Music'),
+        ),
+        drawer: sideDrawerLeft(),
+        backgroundColor: Color.fromRGBO(201, 189, 182, 1),
+        body: SafeArea(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              // Display play/pause button and volume/speed sliders.
+              ControlButtons(_player),
+              // Display seek bar. Using StreamBuilder, this widget rebuilds
+              // each time the position, buffered position or duration changes.
+              StreamBuilder<PositionData>(
+                stream: _positionDataStream,
+                builder: (context, snapshot) {
+                  final positionData = snapshot.data;
+                  return SeekBar(
+                    duration: positionData?.duration ?? Duration.zero,
+                    position: positionData?.position ?? Duration.zero,
+                    bufferedPosition:
+                    positionData?.bufferedPosition ?? Duration.zero,
+                    onChangeEnd: _player.seek,
+                  );
+                },
+              ),
+            ],
+          ),
+>>>>>>> a329cbfe442af7339bc3043d43bc26833701a4bf
         ),
       ),
     );
