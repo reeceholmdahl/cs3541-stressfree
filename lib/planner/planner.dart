@@ -40,10 +40,7 @@ class _ActivityTrackerState extends State<ActivityTracker> {
 
   void pushActivity(String activity, String category, String mood) {
     final String date = getDate();
-    databaseRef.child("/$date/Mood").push().set({"Mood": mood});
-    databaseRef.child("/$date/Activity").push().set({"Activity": activity});
-    databaseRef.child("/$date/Category").push().set({"Category": category});
-
+    databaseRef.child("/$date/Mood").push().set({"Mood": mood, "Activity": activity, "Category": category});
   }
 
   String getDate()
@@ -116,6 +113,19 @@ class _ActivityTrackerState extends State<ActivityTracker> {
                                 if (_formKey.currentState!.validate()) {
                                   logActivity();
                                   pushActivity(_activity.name, _activity.category.name, _mood.name);
+                                  showDialog<String>(
+                                      context: context,
+                                      builder: (BuildContext context) => AlertDialog(
+                                        content: const Text('Activity Saved!'),
+                                        actions: <Widget>[
+                                          TextButton(
+                                            onPressed: () => Navigator.pop(context, 'OK'),
+                                            child: const Text('OK'),
+                                          ),
+                                        ],
+
+                                      )
+                                  );
                                 }
                               },
                               child: Text('Add activity'))
