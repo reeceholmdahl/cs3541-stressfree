@@ -109,7 +109,7 @@ class _HomePageState extends State<HomePage> {
                 //mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
-                    "When you felt " + title + " you did ",
+                    "When you felt " + title + " you",
                   ),
                   Container(
                       height: 200,
