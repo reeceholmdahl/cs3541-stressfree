@@ -3,6 +3,11 @@ import 'dart:developer';
 import 'package:firstapp/data/mood.dart';
 import 'package:flutter/material.dart';
 
+import 'package:firebase_database/firebase_database.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_database/ui/firebase_animated_list.dart';
+import 'dart:convert';
+
 class Planner extends StatelessWidget {
   const Planner({Key? key}) : super(key: key);
 
@@ -22,6 +27,8 @@ class _ActivityTrackerState extends State<ActivityTracker> {
   final _formKey = GlobalKey<FormState>();
   final _text = TextEditingController();
 
+  final  databaseRef = FirebaseDatabase.instance.ref('Planner');
+
   DailyActivity _activity = DailyActivity.nullActivity;
   Mood _mood = Mood.nullMood;
 
@@ -31,6 +38,19 @@ class _ActivityTrackerState extends State<ActivityTracker> {
     super.dispose();
   }
 
+  void pushActivity(String activity, String category, String mood) {
+    final String date = getDate();
+    databaseRef.child("/$date/Mood").push().set({"Mood": mood, "Activity": activity, "Category": category});
+  }
+
+  String getDate()
+  {
+    DateTime date = DateTime.now();
+    String year = date.year.toString();
+    String month = date.month.toString();
+    String day = date.day.toString();
+    return(day + "-" + month + "-" + year);
+  }
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -92,6 +112,20 @@ class _ActivityTrackerState extends State<ActivityTracker> {
                               onPressed: () {
                                 if (_formKey.currentState!.validate()) {
                                   logActivity();
+                                  pushActivity(_activity.name, _activity.category.name, _mood.name);
+                                  showDialog<String>(
+                                      context: context,
+                                      builder: (BuildContext context) => AlertDialog(
+                                        content: const Text('Activity Saved!'),
+                                        actions: <Widget>[
+                                          TextButton(
+                                            onPressed: () => Navigator.pop(context, 'OK'),
+                                            child: const Text('OK'),
+                                          ),
+                                        ],
+
+                                      )
+                                  );
                                 }
                               },
                               child: Text('Add activity'))
