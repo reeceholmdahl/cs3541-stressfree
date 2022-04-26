@@ -133,7 +133,7 @@ class _MyHomePageState extends State<MyHomePage> {
             child: Text(
               _controller.metadata.title,
               style: const TextStyle(
-                color: Colors.white,
+                color: Colors.black,
                 fontSize: 18.0,
               ),
               overflow: TextOverflow.ellipsis,
@@ -163,6 +163,7 @@ class _MyHomePageState extends State<MyHomePage> {
       builder: (context, player) => Scaffold(
         drawer: sideDrawerLeft(),
         appBar: AppBar(
+          backgroundColor: Color.fromRGBO(25, 32, 30, 1),
           leading: Padding(
             padding: const EdgeInsets.only(left: 12.0),
           ),
@@ -182,6 +183,7 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
           ],
         ),
+        backgroundColor: Color.fromRGBO(201, 189, 182, 1),
         body: ListView(
           children: [
             player,
@@ -208,14 +210,14 @@ class _MyHomePageState extends State<MyHomePage> {
       text: TextSpan(
         text: '$title : ',
         style: const TextStyle(
-          color: Colors.blueAccent,
+          color: Colors.black,
           fontWeight: FontWeight.bold,
         ),
         children: [
           TextSpan(
             text: value,
             style: const TextStyle(
-              color: Colors.blueAccent,
+              color: Colors.black,
               fontWeight: FontWeight.w300,
             ),
           ),

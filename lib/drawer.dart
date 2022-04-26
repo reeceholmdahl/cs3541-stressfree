@@ -78,15 +78,6 @@ class sideDrawerLeft extends StatelessWidget {
                   MaterialPageRoute(builder: (context) => const SelfCarePage()));
             },
           ),
-          ListTile(
-            title: const Text('More Soothing Music'),
-            onTap: () {
-              // Update the state of the app
-              // ...
-              // Then close the drawer
-              Navigator.pop(context);
-            },
-          ),
         ],
       ),
     );

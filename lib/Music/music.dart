@@ -5,6 +5,7 @@ import 'package:just_audio/just_audio.dart';
 import './common.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:flutter/foundation.dart';
+import '../drawer.dart';
 
 
 
@@ -101,6 +102,12 @@ class _MyAppState extends State<musicPlayer> with WidgetsBindingObserver {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       home: Scaffold(
+        appBar: AppBar(
+          backgroundColor: Color.fromRGBO(25, 32, 30, 1),
+          title: const Text('Soothing Music'),
+        ),
+        drawer: sideDrawerLeft(),
+        backgroundColor: Color.fromRGBO(201, 189, 182, 1),
         body: SafeArea(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,

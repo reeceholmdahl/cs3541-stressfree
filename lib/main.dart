@@ -14,7 +14,7 @@ import 'testBed.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
-  runApp(Home());
+  runApp(homePage());
 }
 
 class Home extends StatelessWidget {
