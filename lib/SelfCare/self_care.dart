@@ -27,7 +27,9 @@ class SelfCare extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Self Care')),
+      appBar: AppBar(title: const Text('Self Care'),
+        backgroundColor: Color(0xff41544e),
+      ),
       drawer: sideDrawerLeft(),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: (){
@@ -36,7 +38,7 @@ class SelfCare extends StatelessWidget {
               MaterialPageRoute(builder: (context) => const FavoriteTips()),
           );
         },
-        backgroundColor: Colors.red,
+        backgroundColor: Color(0xff9f1818),
         icon: Icon(Icons.favorite),
         label: Text("Favorites"),
       ),
@@ -58,14 +60,16 @@ class _SelfCareIdeasState extends State<SelfCareIdeas> {
   @override
   Widget build(BuildContext context){
     return Scaffold(
-      body: ListView.builder(
-        itemCount: allIdeas.length,
+        backgroundColor: Color(0xffc9bdb6),
+        body: ListView.builder(
+        itemCount: allIdeas.length + 1,
         itemBuilder: (context, index) {
-
+          if(index == allIdeas.length)
+            return Column(key: Key("blank"), children: [SizedBox(height: 70)]);
           Idea idea = allIdeas[index];
-
           return Card(
             child: ListTile(
+              tileColor: Color(0xffefeae7),
               onTap: () {},
               title: Text(idea.what),
               leading: CircleAvatar(
@@ -76,7 +80,7 @@ class _SelfCareIdeasState extends State<SelfCareIdeas> {
               ),
               trailing: IconButton(
                 icon: idea.isFavorited ? Icon(Icons.favorite) : Icon(Icons.favorite_border),
-                color: idea.isFavorited ? Colors.red : Colors.grey,
+                color: idea.isFavorited ? Color(0xff9f1818) : Colors.grey,
                 onPressed: () {
                   setState(() {
                     idea.switchFavorited();

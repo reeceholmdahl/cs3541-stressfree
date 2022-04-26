@@ -10,7 +10,9 @@ class FavoriteTips extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Favorites')),
+      appBar: AppBar(title: const Text('Favorites'),
+          backgroundColor: Color(0xff41544e),
+      ),
       drawer: sideDrawerLeft(),
       body: Favorites(),
       floatingActionButton: FloatingActionButton.extended(
@@ -20,7 +22,7 @@ class FavoriteTips extends StatelessWidget {
             MaterialPageRoute(builder: (context) => const SelfCare()),
           );
         },
-        backgroundColor: Colors.grey,
+        backgroundColor: Color(0xff41544e),
         label: Text("All Ideas"),
         icon: Icon(Icons.arrow_back),
       )
@@ -41,6 +43,7 @@ class _FavoritesState extends State<Favorites> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+        backgroundColor: Color(0xffc9bdb6),
       body: ReorderableListView.builder(
         buildDefaultDragHandles: false,
         itemCount: favorites.length,
@@ -57,46 +60,53 @@ class _FavoritesState extends State<Favorites> {
 
           Idea idea = favorites[index];
 
-          return Dismissible(
+          return Column(
             key: Key(idea.what),
-            onDismissed: (direction) {
-              setState(() {
-                int regListIdx = allIdeas.indexOf(idea);
-                allIdeas[regListIdx].switchFavorited();
-                favorites.removeAt(index);
-              });
-              ScaffoldMessenger.of(context)
-                .showSnackBar(SnackBar(
-                  content: Text("Removed from favorites")
-              ));
-            },
+            children: [
+              Dismissible(
+                key: Key(idea.what),
+                onDismissed: (direction) {
+                  setState(() {
+                    int regListIdx = allIdeas.indexOf(idea);
+                    allIdeas[regListIdx].switchFavorited();
+                    favorites.removeAt(index);
+                  });
+                  ScaffoldMessenger.of(context)
+                    .showSnackBar(SnackBar(
+                      content: Text("Removed from favorites")
+                    ));
+              },
 
-            background: Container(color: Colors.red,
-              alignment: Alignment.centerRight,
-              padding: EdgeInsets.fromLTRB(20, 10, 20, 10),
-              child: Text("Remove",
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 18,
-                )
-              ),
-            ),
-
-            child: ListTile(
-              onTap: (){},
-              title: Text(idea.what),
-              leading: CircleAvatar(
-                child: Icon(idea.icon, color: idea.iconColor,
+                background: Container(color: Color(0xff9f1818),
+                  alignment: Alignment.centerRight,
+                  padding: EdgeInsets.fromLTRB(20, 10, 20, 10),
+                  child: Text("Remove",
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 18,
+                    )
+                  ),
                 ),
-                backgroundColor: idea.backgroundColor,
-              ),
-              trailing: ReorderableDragStartListener(
-                index: index,
-                child: Icon(Icons.view_headline, color: Colors.blueGrey,),
-              )
-            ),
 
-          );
+                child: ListTile(
+                  onTap: (){},
+                  title: Text(idea.what),
+                    tileColor: Color(0xffefeae7),
+                  leading: CircleAvatar(
+                    child: Icon(idea.icon, color: idea.iconColor,
+                    ),
+                    backgroundColor: idea.backgroundColor,
+                  ),
+                  trailing: ReorderableDragStartListener(
+                    index: index,
+                    child: Icon(Icons.view_headline, color: Color(0xff41544e),),
+                  )
+                ),
+
+              ),
+              SizedBox(height: 5
+              )
+            ]);
         },
 
       )
