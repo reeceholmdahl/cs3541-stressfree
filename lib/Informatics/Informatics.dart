@@ -272,7 +272,7 @@ class _HomePageState extends State<HomePage> {
 
         // print(data[i+j]);
         if(data[i+j] == '}') {
-          // print(data.substring(i, i+j+1));
+           print(data.substring(i, i+j+1));
 
           for(int k=i; k < i+j+1; ++k) {
             if(data.substring(k, k+8) == "Activity") {
